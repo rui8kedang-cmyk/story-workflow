@@ -41,16 +41,19 @@
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
     .form-group input, .form-group textarea, .form-group select { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 6px; font-size: 14px; }
-    .form-group textarea { min-height: 120px; resize: vertical; }
+    .form-group textarea { min-height: 100px; resize: vertical; }
     
-    .btn { padding: 10px 20px; border-radius: 8px; font-size: 14px; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; transition: all .2s; }
+    .btn { padding: 12px 24px; border-radius: 8px; font-size: 14px; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px; transition: all .2s; }
     .btn-primary { background: var(--accent1); color: white; }
     .btn-primary:hover { background: #6b59e6; }
     .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
     .btn-ghost:hover { background: var(--surface2); }
     .btn-success { background: var(--green); color: white; }
     .btn-danger { background: var(--red); color: white; }
+    .btn-accent { background: var(--accent2); color: white; }
     .btn:disabled { opacity: .5; cursor: not-allowed; }
+    
+    .btn-group { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
     
     .story-list { display: flex; flex-direction: column; gap: 12px; }
     .story-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
@@ -76,42 +79,107 @@
     
     .empty-state { text-align: center; padding: 40px; color: var(--muted); }
     
-    .edit-area { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-top: 12px; display: none; }
-    .edit-area.active { display: block; }
+    .stat-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; }
+    .stat-box .num { font-size: 28px; font-weight: bold; color: var(--accent1); }
+    .stat-box .label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    
+    .section-title { font-size: 14px; color: var(--muted); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
     
     footer { text-align: center; margin-top: 40px; color: var(--muted); font-size: 12px; }
-    footer a { color: var(--accent1); text-decoration: none; }
+    
+    .config-row { display: flex; gap: 12px; align-items: flex-end; }
+    .config-row .form-group { flex: 1; }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <h1>🧠 偏好分析工具</h1>
-      <p>分析你的故事偏好，生成可复用的偏好报告</p>
+      <p>分析你的故事偏好，生成可复用的偏好技能文件</p>
     </header>
     
     <div class="tabs">
-      <div class="tab active" onclick="switchTab('fetch')">📥 拉取主流程数据</div>
+      <div class="tab active" onclick="switchTab('main')">🎛️ 总控面板</div>
       <div class="tab" onclick="switchTab('manual')">✏️ 手动输入故事</div>
       <div class="tab" onclick="switchTab('modify')">🔄 修改评价对比</div>
     </div>
     
-    <!-- Panel 1: 拉取主流程数据 -->
-    <div class="panel active" id="panel-fetch">
+    <!-- Panel 1: 总控面板 -->
+    <div class="panel active" id="panel-main">
       <div class="panel-header">
-        <h2>📥 从主流程拉取已采纳故事</h2>
+        <h2>🎛️ 总控面板</h2>
       </div>
       
-      <div class="form-group">
-        <label>主流程地址（GitHub Pages）</label>
-        <input type="text" id="fetch-url" value="https://rui8kedang-cmyk.github.io/story-workflow/" placeholder="输入主流程的 GitHub Pages 地址" />
+      <!-- 统计数据 -->
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="num" id="stat-manual">0</div>
+          <div class="label">手动输入故事</div>
+        </div>
+        <div class="stat-box">
+          <div class="num" id="stat-modify">0</div>
+          <div class="label">修改对比项</div>
+        </div>
+        <div class="stat-box">
+          <div class="num" id="stat-total">0</div>
+          <div class="label">总数据条数</div>
+        </div>
       </div>
       
-      <button class="btn btn-primary" onclick="fetchApprovedStories()">
-        <span>📥</span> 拉取已采纳故事
-      </button>
+      <!-- AI 配置 -->
+      <div class="section-title">🔧 AI 接口配置</div>
+      <div class="config-row">
+        <div class="form-group">
+          <label>Base URL</label>
+          <input type="text" id="ai-base-url" placeholder="如：https://api.openai.com" />
+        </div>
+        <div class="form-group">
+          <label>API Key</label>
+          <input type="password" id="ai-api-key" placeholder="sk-..." />
+        </div>
+        <div class="form-group">
+          <label>模型</label>
+          <input type="text" id="ai-model" placeholder="gpt-4o" />
+        </div>
+        <button class="btn btn-ghost" onclick="saveAIConfig()">💾 保存配置</button>
+      </div>
       
-      <div id="fetched-stories" style="margin-top:24px"></div>
+      <!-- 主要操作 -->
+      <div class="section-title" style="margin-top:24px">🎯 核心操作</div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="analyzeAll()">
+          <span>🧠</span> 偏好分析
+        </button>
+        <button class="btn btn-success" onclick="exportSkill()">
+          <span>📦</span> 结果输出 (Skill)
+        </button>
+      </div>
+      
+      <!-- 配置管理 -->
+      <div class="section-title">💾 数据管理</div>
+      <div class="btn-group">
+        <button class="btn btn-accent" onclick="saveAllData()">
+          <span>💾</span> 保存全部数据
+        </button>
+        <button class="btn btn-ghost" onclick="loadAllData()">
+          <span>📂</span> 读取保存数据
+        </button>
+        <button class="btn btn-ghost" onclick="downloadDataFile()">
+          <span>📥</span> 下载数据文件
+        </button>
+        <button class="btn btn-ghost" onclick="document.getElementById('import-file').click()">
+          <span>📤</span> 导入数据文件
+        </button>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importDataFile(event)" />
+      </div>
+      
+      <!-- 分析结果 -->
+      <div class="preference-result" id="result-panel" style="display:none">
+        <h3>📊 偏好分析结果</h3>
+        <div id="result-content"></div>
+      </div>
     </div>
     
     <!-- Panel 2: 手动输入故事 -->
@@ -122,9 +190,11 @@
       
       <div id="manual-stories" class="story-list"></div>
       
-      <button class="btn btn-ghost" style="margin-top:16px" onclick="addManualStory()">
-        <span>➕</span> 添加故事
-      </button>
+      <div style="margin-top:16px">
+        <button class="btn btn-ghost" onclick="addManualStory()">
+          <span>➕</span> 添加故事
+        </button>
+      </div>
     </div>
     
     <!-- Panel 3: 修改评价对比 -->
@@ -135,123 +205,92 @@
       
       <div id="modify-list"></div>
       
-      <button class="btn btn-ghost" style="margin-top:16px" onclick="addModifyItem()">
-        <span>➕</span> 添加对比项
-      </button>
-    </div>
-    
-    <!-- 分析结果 -->
-    <div class="preference-result" id="result-panel" style="display:none">
-      <h3>📊 偏好分析结果</h3>
-      <div id="result-content"></div>
-      <div style="margin-top:20px">
-        <button class="btn btn-success" onclick="downloadPreference()">
-          <span>📥</span> 下载偏好报告
-        </button>
-        <button class="btn btn-ghost" style="margin-left:12px" onclick="copyPreference()">
-          <span>📋</span> 复制到剪贴板
+      <div style="margin-top:16px">
+        <button class="btn btn-ghost" onclick="addModifyItem()">
+          <span>➕</span> 添加对比项
         </button>
       </div>
     </div>
     
     <footer>
-      <p>偏好报告用于 <a href="https://rui8kedang-cmyk.github.io/story-workflow/" target="_blank">主流程</a> 的创意生成优化</p>
+      <p>偏好分析用于优化主流程的创意生成质量</p>
     </footer>
   </div>
 
   <script>
     // 数据存储
-    let approvedStories = [];
     let manualStories = [];
     let modifyItems = [];
     let currentPreference = null;
     
-    // AI 接口配置（从 localStorage 读取，或让用户配置）
-    function getAIConfig() {
-      return {
-        baseUrl: localStorage.getItem('ai_base_url') || 'https://api.openai.com',
-        apiKey: localStorage.getItem('ai_api_key') || '',
-        model: localStorage.getItem('ai_model') || 'gpt-4o'
-      };
-    }
+    // ========== 初始化 ==========
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAIConfig();
+      loadFromStorage();
+      updateStats();
+      
+      // 默认添加两个输入框
+      if (manualStories.length === 0) {
+        addManualStory();
+        addManualStory();
+      } else {
+        renderManualStories();
+      }
+      
+      if (modifyItems.length === 0) {
+        addModifyItem();
+      } else {
+        renderModifyItems();
+      }
+    });
     
-    // 切换 Tab
+    // ========== Tab 切换 ==========
     function switchTab(tabName) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
       document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
       document.getElementById(`panel-${tabName}`).classList.add('active');
-    }
-    
-    // ========== Panel 1: 拉取主流程数据 ==========
-    async function fetchApprovedStories() {
-      const url = document.getElementById('fetch-url').value.trim();
-      if (!url) {
-        toast('请输入主流程地址', 'error');
-        return;
-      }
       
-      const btn = event.target;
-      btn.classList.add('loading');
-      btn.disabled = true;
-      
-      try {
-        // 尝试拉取 approved-stories.json
-        const res = await fetch(url.replace(/\/$/, '') + '/approved-stories.json?t=' + Date.now());
-        if (!res.ok) throw new Error('拉取失败');
-        const data = await res.json();
-        approvedStories = data.stories || [];
-        renderFetchedStories();
-        toast(`成功拉取 ${approvedStories.length} 个故事`, 'success');
-      } catch (e) {
-        toast('拉取失败：请确保主流程已导出 approved-stories.json 并上传到 GitHub', 'error');
-      } finally {
-        btn.classList.remove('loading');
-        btn.disabled = false;
+      if (tabName === 'main') {
+        updateStats();
       }
     }
     
-    function renderFetchedStories() {
-      const container = document.getElementById('fetched-stories');
-      if (approvedStories.length === 0) {
-        container.innerHTML = '<div class="empty-state">暂无已采纳故事</div>';
-        return;
-      }
-      
-      container.innerHTML = `
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-          <span style="font-size:14px;color:var(--muted)">已加载 ${approvedStories.length} 个故事</span>
-          <button class="btn btn-primary" onclick="analyzeFromFetch()">🧠 分析偏好</button>
-        </div>
-        <div class="story-list">
-          ${approvedStories.map((s, i) => `
-            <div class="story-card">
-              <div class="story-card-header">
-                <h3>${s.title || '未命名故事'}</h3>
-                <span style="font-size:11px;color:var(--muted)">${s.tags?.join(' / ') || ''}</span>
-              </div>
-              <div class="story-card-body">
-                <div><strong>核心概念：</strong>${s.concept || ''}</div>
-                <div style="margin-top:8px"><strong>故事：</strong>${s.story || ''}</div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
+    // ========== AI 配置 ==========
+    function loadAIConfig() {
+      document.getElementById('ai-base-url').value = localStorage.getItem('pref_ai_base_url') || '';
+      document.getElementById('ai-api-key').value = localStorage.getItem('pref_ai_api_key') || '';
+      document.getElementById('ai-model').value = localStorage.getItem('pref_ai_model') || 'gpt-4o';
     }
     
-    async function analyzeFromFetch() {
-      if (approvedStories.length < 3) {
-        toast('至少需要 3 个故事才能分析', 'error');
-        return;
-      }
-      await analyzePreference(approvedStories);
+    function saveAIConfig() {
+      localStorage.setItem('pref_ai_base_url', document.getElementById('ai-base-url').value.trim());
+      localStorage.setItem('pref_ai_api_key', document.getElementById('ai-api-key').value.trim());
+      localStorage.setItem('pref_ai_model', document.getElementById('ai-model').value.trim());
+      toast('AI 配置已保存', 'success');
     }
     
-    // ========== Panel 2: 手动输入故事 ==========
+    function getAIConfig() {
+      return {
+        baseUrl: document.getElementById('ai-base-url').value.trim() || localStorage.getItem('pref_ai_base_url') || '',
+        apiKey: document.getElementById('ai-api-key').value.trim() || localStorage.getItem('pref_ai_api_key') || '',
+        model: document.getElementById('ai-model').value.trim() || localStorage.getItem('pref_ai_model') || 'gpt-4o'
+      };
+    }
+    
+    // ========== 统计更新 ==========
+    function updateStats() {
+      const manualCount = collectManualStories().length;
+      const modifyCount = collectModifyItems().length;
+      document.getElementById('stat-manual').textContent = manualCount;
+      document.getElementById('stat-modify').textContent = modifyCount;
+      document.getElementById('stat-total').textContent = manualCount + modifyCount;
+    }
+    
+    // ========== 手动输入故事 ==========
     let manualStoryCount = 0;
     
-    function addManualStory() {
+    function addManualStory(data = null) {
       manualStoryCount++;
       const container = document.getElementById('manual-stories');
       const div = document.createElement('div');
@@ -260,58 +299,65 @@
       div.innerHTML = `
         <div class="story-card-header">
           <h3>故事 ${manualStoryCount}</h3>
-          <button class="btn btn-danger btn-sm" onclick="removeManualStory(${manualStoryCount})">🗑️ 删除</button>
+          <button class="btn btn-danger" style="padding:6px 12px;font-size:12px" onclick="removeManualStory(${manualStoryCount})">🗑️ 删除</button>
         </div>
         <div class="form-group">
           <label>标题</label>
-          <input type="text" class="manual-title" placeholder="故事标题" />
-        </div>
-        <div class="form-group">
-          <label>核心概念</label>
-          <input type="text" class="manual-concept" placeholder="一句话描述核心概念" />
+          <input type="text" class="manual-title" placeholder="故事标题" value="${data?.title || ''}" />
         </div>
         <div class="form-group">
           <label>故事内容</label>
-          <textarea class="manual-story" placeholder="详细描述故事"></textarea>
+          <textarea class="manual-story" placeholder="详细描述故事">${data?.story || ''}</textarea>
         </div>
         <div class="form-group">
           <label>标签（用逗号分隔）</label>
-          <input type="text" class="manual-tags" placeholder="温情, 成长, 反转" />
+          <input type="text" class="manual-tags" placeholder="温情, 成长, 反转" value="${data?.tags?.join(', ') || ''}" />
         </div>
       `;
       container.appendChild(div);
+      
+      // 输入变化时自动保存
+      div.querySelectorAll('input, textarea').forEach(el => {
+        el.addEventListener('input', () => {
+          saveToStorage();
+          updateStats();
+        });
+      });
     }
     
     function removeManualStory(id) {
-      document.getElementById(`manual-${id}`).remove();
+      document.getElementById(`manual-${id}`)?.remove();
+      saveToStorage();
+      updateStats();
+    }
+    
+    function renderManualStories() {
+      const container = document.getElementById('manual-stories');
+      container.innerHTML = '';
+      manualStories.forEach(s => addManualStory(s));
     }
     
     function collectManualStories() {
       const stories = [];
       document.querySelectorAll('#manual-stories .story-card').forEach(card => {
-        stories.push({
-          title: card.querySelector('.manual-title').value.trim(),
-          concept: card.querySelector('.manual-concept').value.trim(),
-          story: card.querySelector('.manual-story').value.trim(),
-          tags: card.querySelector('.manual-tags').value.split(',').map(t => t.trim()).filter(t => t)
-        });
+        const title = card.querySelector('.manual-title')?.value?.trim();
+        const story = card.querySelector('.manual-story')?.value?.trim();
+        const tagsStr = card.querySelector('.manual-tags')?.value || '';
+        if (title && story) {
+          stories.push({
+            title,
+            story,
+            tags: tagsStr.split(',').map(t => t.trim()).filter(t => t)
+          });
+        }
       });
-      return stories.filter(s => s.title && s.story);
+      return stories;
     }
     
-    async function analyzeFromManual() {
-      const stories = collectManualStories();
-      if (stories.length < 3) {
-        toast('至少需要 3 个完整故事才能分析', 'error');
-        return;
-      }
-      await analyzePreference(stories);
-    }
-    
-    // ========== Panel 3: 修改评价对比 ==========
+    // ========== 修改评价对比 ==========
     let modifyCount = 0;
     
-    function addModifyItem() {
+    function addModifyItem(data = null) {
       modifyCount++;
       const container = document.getElementById('modify-list');
       const div = document.createElement('div');
@@ -320,81 +366,196 @@
       div.innerHTML = `
         <div class="story-card-header">
           <h3>对比项 ${modifyCount}</h3>
-          <button class="btn btn-danger btn-sm" onclick="removeModifyItem(${modifyCount})">🗑️ 删除</button>
+          <button class="btn btn-danger" style="padding:6px 12px;font-size:12px" onclick="removeModifyItem(${modifyCount})">🗑️ 删除</button>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
           <div>
             <div class="form-group">
               <label>修改前（原始版本）</label>
-              <textarea class="modify-before" placeholder="原始故事内容"></textarea>
+              <textarea class="modify-before" placeholder="原始故事内容">${data?.before || ''}</textarea>
             </div>
             <div class="form-group">
               <label>为什么不满意</label>
-              <textarea class="modify-before-reason" placeholder="描述不满意的原因"></textarea>
+              <textarea class="modify-before-reason" placeholder="描述不满意的原因">${data?.beforeReason || ''}</textarea>
             </div>
           </div>
           <div>
             <div class="form-group">
               <label>修改后（改进版本）</label>
-              <textarea class="modify-after" placeholder="修改后的故事内容"></textarea>
+              <textarea class="modify-after" placeholder="修改后的故事内容">${data?.after || ''}</textarea>
             </div>
             <div class="form-group">
               <label>为什么满意</label>
-              <textarea class="modify-after-reason" placeholder="描述满意的原因"></textarea>
+              <textarea class="modify-after-reason" placeholder="描述满意的原因">${data?.afterReason || ''}</textarea>
             </div>
           </div>
         </div>
       `;
       container.appendChild(div);
+      
+      // 输入变化时自动保存
+      div.querySelectorAll('input, textarea').forEach(el => {
+        el.addEventListener('input', () => {
+          saveToStorage();
+          updateStats();
+        });
+      });
     }
     
     function removeModifyItem(id) {
-      document.getElementById(`modify-${id}`).remove();
+      document.getElementById(`modify-${id}`)?.remove();
+      saveToStorage();
+      updateStats();
+    }
+    
+    function renderModifyItems() {
+      const container = document.getElementById('modify-list');
+      container.innerHTML = '';
+      modifyItems.forEach(item => addModifyItem(item));
     }
     
     function collectModifyItems() {
       const items = [];
       document.querySelectorAll('#modify-list .story-card').forEach(card => {
-        items.push({
-          before: card.querySelector('.modify-before').value.trim(),
-          beforeReason: card.querySelector('.modify-before-reason').value.trim(),
-          after: card.querySelector('.modify-after').value.trim(),
-          afterReason: card.querySelector('.modify-after-reason').value.trim()
-        });
+        const before = card.querySelector('.modify-before')?.value?.trim();
+        const after = card.querySelector('.modify-after')?.value?.trim();
+        if (before && after) {
+          items.push({
+            before,
+            beforeReason: card.querySelector('.modify-before-reason')?.value?.trim() || '',
+            after,
+            afterReason: card.querySelector('.modify-after-reason')?.value?.trim() || ''
+          });
+        }
       });
-      return items.filter(i => i.before && i.after);
+      return items;
     }
     
-    async function analyzeFromModify() {
-      const items = collectModifyItems();
-      if (items.length < 2) {
-        toast('至少需要 2 个完整对比项才能分析', 'error');
+    // ========== 本地存储 ==========
+    function saveToStorage() {
+      const data = {
+        manualStories: collectManualStories(),
+        modifyItems: collectModifyItems(),
+        savedAt: new Date().toISOString()
+      };
+      localStorage.setItem('pref_tool_data', JSON.stringify(data));
+    }
+    
+    function loadFromStorage() {
+      try {
+        const saved = localStorage.getItem('pref_tool_data');
+        if (saved) {
+          const data = JSON.parse(saved);
+          manualStories = data.manualStories || [];
+          modifyItems = data.modifyItems || [];
+        }
+      } catch (e) {
+        console.error('加载存储数据失败', e);
+      }
+    }
+    
+    // ========== 数据管理按钮 ==========
+    function saveAllData() {
+      saveToStorage();
+      toast('数据已保存到浏览器本地', 'success');
+    }
+    
+    function loadAllData() {
+      loadFromStorage();
+      renderManualStories();
+      renderModifyItems();
+      updateStats();
+      toast('数据已恢复', 'success');
+    }
+    
+    function downloadDataFile() {
+      const data = {
+        manualStories: collectManualStories(),
+        modifyItems: collectModifyItems(),
+        exportedAt: new Date().toISOString()
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `preference-data-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('数据文件已下载', 'success');
+    }
+    
+    function importDataFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data.manualStories) manualStories = data.manualStories;
+          if (data.modifyItems) modifyItems = data.modifyItems;
+          
+          renderManualStories();
+          renderModifyItems();
+          saveToStorage();
+          updateStats();
+          toast('数据导入成功', 'success');
+        } catch (err) {
+          toast('导入失败：文件格式错误', 'error');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+    
+    // ========== 偏好分析 ==========
+    async function analyzeAll() {
+      const manual = collectManualStories();
+      const modify = collectModifyItems();
+      
+      if (manual.length === 0 && modify.length === 0) {
+        toast('请至少输入一些故事或对比数据', 'error');
         return;
       }
-      await analyzeFromModifyItems(items);
-    }
-    
-    // ========== 核心分析逻辑 ==========
-    async function analyzePreference(stories) {
+      
       const cfg = getAIConfig();
       if (!cfg.apiKey) {
-        toast('请先配置 AI 接口（点击右上角设置）', 'error');
+        toast('请先配置 AI 接口', 'error');
         return;
       }
       
-      const btn = event?.target;
-      if (btn) {
-        btn.classList.add('loading');
-        btn.disabled = true;
+      const btn = event.target;
+      btn.classList.add('loading');
+      btn.disabled = true;
+      
+      // 构建综合分析 prompt
+      let prompt = `你是一位专业的用户偏好分析师。
+请综合分析以下数据，总结用户的创作偏好。
+
+`;
+      
+      if (manual.length > 0) {
+        prompt += `【手动输入的喜欢的故事】(${manual.length} 个)\n`;
+        prompt += manual.map((s, i) => `
+【故事${i+1}】${s.title}
+内容：${s.story}
+标签：${s.tags?.join('、') || '无'}
+`).join('\n');
+        prompt += '\n\n';
       }
       
-      const storyList = stories.map((s, i) => `【故事${i+1}】${s.title}\n核心概念：${s.concept || ''}\n内容：${s.story}\n标签：${s.tags?.join('、') || ''}`).join('\n\n');
+      if (modify.length > 0) {
+        prompt += `【修改前后对比数据】(${modify.length} 组)\n`;
+        prompt += modify.map((item, i) => `
+【对比${i+1}】
+修改前：${item.before}
+不满意原因：${item.beforeReason}
+修改后：${item.after}
+满意原因：${item.afterReason}
+`).join('\n---\n');
+      }
       
-      const prompt = `你是一位专业的用户偏好分析师。
-请分析以下已采纳的故事，总结用户的创作偏好。
-
-【已采纳故事】(${stories.length} 个)
-${storyList}
+      prompt += `
 
 请按以下 JSON 格式输出，不要其他文字：
 {
@@ -405,6 +566,7 @@ ${storyList}
   "narrativeStyle": "叙事风格偏好（如：反转、温情、幽默）",
   "targetAudience": "目标受众推断",
   "keyElements": ["关键元素1", "关键元素2"],
+  "coreConcepts": ["核心概念1", "核心概念2"],
   "suggestions": "给用户的具体建议"
 }`;
       
@@ -430,8 +592,7 @@ ${storyList}
         
         currentPreference = {
           analyzedAt: new Date().toLocaleString(),
-          sourceType: 'approved_stories',
-          sourceCount: stories.length,
+          sourceCount: { manual: manual.length, modify: modify.length },
           report
         };
         
@@ -440,91 +601,8 @@ ${storyList}
       } catch (e) {
         toast('分析失败：' + e.message, 'error');
       } finally {
-        if (btn) {
-          btn.classList.remove('loading');
-          btn.disabled = false;
-        }
-      }
-    }
-    
-    async function analyzeFromModifyItems(items) {
-      const cfg = getAIConfig();
-      if (!cfg.apiKey) {
-        toast('请先配置 AI 接口', 'error');
-        return;
-      }
-      
-      const btn = event?.target;
-      if (btn) {
-        btn.classList.add('loading');
-        btn.disabled = true;
-      }
-      
-      const itemList = items.map((item, i) => `
-【对比项${i+1}】
-修改前：
-${item.before}
-不满意原因：${item.beforeReason}
-
-修改后：
-${item.after}
-满意原因：${item.afterReason}
-`).join('\n---\n');
-      
-      const prompt = `你是一位专业的用户偏好分析师。
-请通过对比修改前后的故事版本，分析用户的创作偏好和审美倾向。
-
-【对比数据】(${items.length} 组)
-${itemList}
-
-请按以下 JSON 格式输出，不要其他文字：
-{
-  "preferredThemes": ["从修改后提炼的偏好主题"],
-  "avoidedThemes": ["从修改前提炼的避免主题"],
-  "visualStyle": "画风倾向（从修改后的改进方向推断）",
-  "storyStructure": "故事结构偏好（如：喜欢什么结构，避免什么结构）",
-  "narrativeStyle": "叙事风格偏好",
-  "commonImprovements": ["常见改进方向1", "常见改进方向2"],
-  "avoidedPatterns": ["避免的模式1", "避免的模式2"],
-  "suggestions": "基于对比分析的优化建议"
-}`;
-      
-      try {
-        const res = await fetch(cfg.baseUrl + '/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + cfg.apiKey
-          },
-          body: JSON.stringify({
-            model: cfg.model,
-            messages: [{ role: 'user', content: prompt }],
-            temperature: 0.3
-          })
-        });
-        
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error?.message || '分析失败');
-        
-        const reportText = data.choices[0].message.content;
-        const report = JSON.parse(reportText);
-        
-        currentPreference = {
-          analyzedAt: new Date().toLocaleString(),
-          sourceType: 'modify_comparison',
-          sourceCount: items.length,
-          report
-        };
-        
-        displayResult();
-        toast('偏好分析完成！', 'success');
-      } catch (e) {
-        toast('分析失败：' + e.message, 'error');
-      } finally {
-        if (btn) {
-          btn.classList.remove('loading');
-          btn.disabled = false;
-        }
+        btn.classList.remove('loading');
+        btn.disabled = false;
       }
     }
     
@@ -539,41 +617,66 @@ ${itemList}
         </div>
         <div class="preference-item">
           <label>数据来源</label>
-          <span>${currentPreference.sourceType === 'approved_stories' ? '已采纳故事' : '修改对比'}（${currentPreference.sourceCount} 条）</span>
+          <span>手动故事 ${currentPreference.sourceCount.manual} 条 + 对比数据 ${currentPreference.sourceCount.modify} 条</span>
         </div>
-        ${r.preferredThemes ? `<div class="preference-item"><label>✅ 偏好主题</label><span>${r.preferredThemes.join('、')}</span></div>` : ''}
-        ${r.avoidedThemes ? `<div class="preference-item"><label>❌ 避免主题</label><span>${r.avoidedThemes.join('、')}</span></div>` : ''}
+        ${r.preferredThemes?.length ? `<div class="preference-item"><label>✅ 偏好主题</label><span>${r.preferredThemes.join('、')}</span></div>` : ''}
+        ${r.avoidedThemes?.length ? `<div class="preference-item"><label>❌ 避免主题</label><span>${r.avoidedThemes.join('、')}</span></div>` : ''}
         ${r.visualStyle ? `<div class="preference-item"><label>🎨 画风倾向</label><span>${r.visualStyle}</span></div>` : ''}
         ${r.storyStructure ? `<div class="preference-item"><label>📖 故事结构</label><span>${r.storyStructure}</span></div>` : ''}
         ${r.narrativeStyle ? `<div class="preference-item"><label>🎭 叙事风格</label><span>${r.narrativeStyle}</span></div>` : ''}
-        ${r.keyElements ? `<div class="preference-item"><label>🔑 关键元素</label><span>${r.keyElements.join('、')}</span></div>` : ''}
-        ${r.commonImprovements ? `<div class="preference-item"><label>📈 常见改进</label><span>${r.commonImprovements.join('、')}</span></div>` : ''}
-        ${r.avoidedPatterns ? `<div class="preference-item"><label>🚫 避免模式</label><span>${r.avoidedPatterns.join('、')}</span></div>` : ''}
-        ${r.suggestions ? `<div class="preference-item"><label>💡 建议</label><span>${r.suggestions}</span></div>` : ''}
+        ${r.targetAudience ? `<div class="preference-item"><label>👥 目标受众</label><span>${r.targetAudience}</span></div>` : ''}
+        ${r.keyElements?.length ? `<div class="preference-item"><label>🔑 关键元素</label><span>${r.keyElements.join('、')}</span></div>` : ''}
+        ${r.coreConcepts?.length ? `<div class="preference-item"><label>💡 核心概念</label><span>${r.coreConcepts.join('、')}</span></div>` : ''}
+        ${r.suggestions ? `<div class="preference-item"><label>📝 建议</label><span>${r.suggestions}</span></div>` : ''}
       `;
       document.getElementById('result-panel').style.display = 'block';
     }
     
-    function downloadPreference() {
-      if (!currentPreference) return;
-      const blob = new Blob([JSON.stringify(currentPreference, null, 2)], { type: 'application/json' });
+    // ========== 导出 Skill ==========
+    function exportSkill() {
+      if (!currentPreference) {
+        toast('请先进行偏好分析', 'error');
+        return;
+      }
+      
+      const r = currentPreference.report;
+      const skill = {
+        name: "用户故事偏好",
+        description: "基于用户历史数据的故事创作偏好",
+        version: "1.0",
+        createdAt: new Date().toISOString(),
+        preference: {
+          themes: {
+            preferred: r.preferredThemes || [],
+            avoided: r.avoidedThemes || []
+          },
+          style: {
+            visual: r.visualStyle || '',
+            narrative: r.narrativeStyle || '',
+            structure: r.storyStructure || ''
+          },
+          elements: r.keyElements || [],
+          coreConcepts: r.coreConcepts || [],
+          targetAudience: r.targetAudience || '',
+          suggestions: r.suggestions || ''
+        },
+        metadata: {
+          analyzedAt: currentPreference.analyzedAt,
+          sourceCount: currentPreference.sourceCount
+        }
+      };
+      
+      const blob = new Blob([JSON.stringify(skill, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'preference-analysis.json';
+      a.download = `preference-skill-${new Date().toISOString().slice(0,10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      toast('偏好报告已下载！请上传到 GitHub', 'success');
+      toast('Skill 文件已下载', 'success');
     }
     
-    function copyPreference() {
-      if (!currentPreference) return;
-      const text = JSON.stringify(currentPreference, null, 2);
-      navigator.clipboard.writeText(text).then(() => {
-        toast('已复制到剪贴板', 'success');
-      });
-    }
-    
+    // ========== Toast ==========
     function toast(msg, type = 'success') {
       const t = document.createElement('div');
       t.className = `toast ${type}`;
@@ -581,14 +684,6 @@ ${itemList}
       document.body.appendChild(t);
       setTimeout(() => t.remove(), 3000);
     }
-    
-    // 初始化
-    document.addEventListener('DOMContentLoaded', () => {
-      // 添加默认的故事输入框
-      addManualStory();
-      addManualStory();
-      addModifyItem();
-    });
   </script>
 </body>
 </html>
