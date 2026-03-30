@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>馃 鍋忓ソ鍒嗘瀽宸ュ叿</title>
+  <title>🧠 偏好分析工具</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -96,140 +96,140 @@
 <body>
   <div class="container">
     <header>
-      <h1>馃 鍋忓ソ鍒嗘瀽宸ュ叿</h1>
-      <p>鍒嗘瀽浣犵殑鏁呬簨鍋忓ソ锛岀敓鎴愬彲澶嶇敤鐨勫亸濂芥妧鑳芥枃浠?/p>
+      <h1>🧠 偏好分析工具</h1>
+      <p>分析你的故事偏好，生成可复用的偏好技能文件</p>
     </header>
     
     <div class="tabs">
-      <div class="tab active" onclick="switchTab('main')">馃帥锔?鎬绘帶闈㈡澘</div>
-      <div class="tab" onclick="switchTab('manual')">鉁忥笍 鎵嬪姩杈撳叆鏁呬簨</div>
-      <div class="tab" onclick="switchTab('modify')">馃攧 淇敼璇勪环瀵规瘮</div>
+      <div class="tab active" onclick="switchTab('main')">🎛️ 总控面板</div>
+      <div class="tab" onclick="switchTab('manual')">✏️ 手动输入故事</div>
+      <div class="tab" onclick="switchTab('modify')">🔄 修改评价对比</div>
     </div>
     
-    <!-- Panel 1: 鎬绘帶闈㈡澘 -->
+    <!-- Panel 1: 总控面板 -->
     <div class="panel active" id="panel-main">
       <div class="panel-header">
-        <h2>馃帥锔?鎬绘帶闈㈡澘</h2>
+        <h2>🎛️ 总控面板</h2>
       </div>
       
-      <!-- 缁熻鏁版嵁 -->
+      <!-- 统计数据 -->
       <div class="stats-grid">
         <div class="stat-box">
           <div class="num" id="stat-manual">0</div>
-          <div class="label">鎵嬪姩杈撳叆鏁呬簨</div>
+          <div class="label">手动输入故事</div>
         </div>
         <div class="stat-box">
           <div class="num" id="stat-modify">0</div>
-          <div class="label">淇敼瀵规瘮椤?/div>
+          <div class="label">修改对比项</div>
         </div>
         <div class="stat-box">
           <div class="num" id="stat-total">0</div>
-          <div class="label">鎬绘暟鎹潯鏁?/div>
+          <div class="label">总数据条数</div>
         </div>
       </div>
       
-      <!-- AI 閰嶇疆 -->
-      <div class="section-title">馃敡 AI 鎺ュ彛閰嶇疆</div>
+      <!-- AI 配置 -->
+      <div class="section-title">🔧 AI 接口配置</div>
       <div class="config-row">
         <div class="form-group">
           <label>Base URL</label>
-          <input type="text" id="ai-base-url" placeholder="濡傦細https://api.openai.com" />
+          <input type="text" id="ai-base-url" placeholder="如：https://api.openai.com" />
         </div>
         <div class="form-group">
           <label>API Key</label>
           <input type="password" id="ai-api-key" placeholder="sk-..." />
         </div>
         <div class="form-group">
-          <label>妯″瀷</label>
+          <label>模型</label>
           <input type="text" id="ai-model" placeholder="gpt-4o" />
         </div>
-        <button class="btn btn-ghost" onclick="saveAIConfig()">馃捑 淇濆瓨閰嶇疆</button>
+        <button class="btn btn-ghost" onclick="saveAIConfig()">💾 保存配置</button>
       </div>
       
-      <!-- 涓昏鎿嶄綔 -->
-      <div class="section-title" style="margin-top:24px">馃幆 鏍稿績鎿嶄綔</div>
+      <!-- 主要操作 -->
+      <div class="section-title" style="margin-top:24px">🎯 核心操作</div>
       <div class="btn-group">
         <button class="btn btn-primary" onclick="analyzeAll()">
-          <span>馃</span> 鍋忓ソ鍒嗘瀽
+          <span>🧠</span> 偏好分析
         </button>
         <button class="btn btn-success" onclick="exportSkill()">
-          <span>馃摝</span> 缁撴灉杈撳嚭 (Skill)
+          <span>📦</span> 结果输出 (Skill)
         </button>
       </div>
       
-      <!-- 閰嶇疆绠＄悊 -->
-      <div class="section-title">馃捑 鏁版嵁绠＄悊</div>
+      <!-- 配置管理 -->
+      <div class="section-title">💾 数据管理</div>
       <div class="btn-group">
         <button class="btn btn-accent" onclick="saveAllData()">
-          <span>馃捑</span> 淇濆瓨鍏ㄩ儴鏁版嵁
+          <span>💾</span> 保存全部数据
         </button>
         <button class="btn btn-ghost" onclick="loadAllData()">
-          <span>馃搨</span> 璇诲彇淇濆瓨鏁版嵁
+          <span>📂</span> 读取保存数据
         </button>
         <button class="btn btn-ghost" onclick="downloadDataFile()">
-          <span>馃摜</span> 涓嬭浇鏁版嵁鏂囦欢
+          <span>📥</span> 下载数据文件
         </button>
         <button class="btn btn-ghost" onclick="document.getElementById('import-file').click()">
-          <span>馃摛</span> 瀵煎叆鏁版嵁鏂囦欢
+          <span>📤</span> 导入数据文件
         </button>
         <input type="file" id="import-file" accept=".json" style="display:none" onchange="importDataFile(event)" />
       </div>
       
-      <!-- 鍒嗘瀽缁撴灉 -->
+      <!-- 分析结果 -->
       <div class="preference-result" id="result-panel" style="display:none">
-        <h3>馃搳 鍋忓ソ鍒嗘瀽缁撴灉</h3>
+        <h3>📊 偏好分析结果</h3>
         <div id="result-content"></div>
       </div>
     </div>
     
-    <!-- Panel 2: 鎵嬪姩杈撳叆鏁呬簨 -->
+    <!-- Panel 2: 手动输入故事 -->
     <div class="panel" id="panel-manual">
       <div class="panel-header">
-        <h2>鉁忥笍 鎵嬪姩杈撳叆浣犵殑鏁呬簨</h2>
+        <h2>✏️ 手动输入你的故事</h2>
       </div>
       
       <div id="manual-stories" class="story-list"></div>
       
       <div style="margin-top:16px">
         <button class="btn btn-ghost" onclick="addManualStory()">
-          <span>鉃?/span> 娣诲姞鏁呬簨
+          <span>➕</span> 添加故事
         </button>
       </div>
     </div>
     
-    <!-- Panel 3: 淇敼璇勪环瀵规瘮 -->
+    <!-- Panel 3: 修改评价对比 -->
     <div class="panel" id="panel-modify">
       <div class="panel-header">
-        <h2>馃攧 淇敼鍓嶅悗瀵规瘮鍒嗘瀽</h2>
+        <h2>🔄 修改前后对比分析</h2>
       </div>
       
       <div id="modify-list"></div>
       
       <div style="margin-top:16px">
         <button class="btn btn-ghost" onclick="addModifyItem()">
-          <span>鉃?/span> 娣诲姞瀵规瘮椤?
+          <span>➕</span> 添加对比项
         </button>
       </div>
     </div>
     
     <footer>
-      <p>鍋忓ソ鍒嗘瀽鐢ㄤ簬浼樺寲涓绘祦绋嬬殑鍒涙剰鐢熸垚璐ㄩ噺</p>
+      <p>偏好分析用于优化主流程的创意生成质量</p>
     </footer>
   </div>
 
   <script>
-    // 鏁版嵁瀛樺偍
+    // 数据存储
     let manualStories = [];
     let modifyItems = [];
     let currentPreference = null;
     
-    // ========== 鍒濆鍖?==========
+    // ========== 初始化 ==========
     document.addEventListener('DOMContentLoaded', () => {
       loadAIConfig();
       loadFromStorage();
       updateStats();
       
-      // 榛樿娣诲姞涓や釜杈撳叆妗?
+      // 默认添加两个输入框
       if (manualStories.length === 0) {
         addManualStory();
         addManualStory();
@@ -244,7 +244,7 @@
       }
     });
     
-    // ========== Tab 鍒囨崲 ==========
+    // ========== Tab 切换 ==========
     function switchTab(tabName) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -256,8 +256,8 @@
       }
     }
     
-    // ========== AI 閰嶇疆 ==========
-    // 浣跨敤涓绘祦绋嬬殑閰嶇疆 key锛屽疄鐜伴厤缃叡浜?
+    // ========== AI 配置 ==========
+    // 使用主流程的配置 key，实现配置共享
     function loadAIConfig() {
       document.getElementById('ai-base-url').value = localStorage.getItem('ai_base_url') || '';
       document.getElementById('ai-api-key').value = localStorage.getItem('ai_api_key') || '';
@@ -268,7 +268,7 @@
       localStorage.setItem('ai_base_url', document.getElementById('ai-base-url').value.trim());
       localStorage.setItem('ai_api_key', document.getElementById('ai-api-key').value.trim());
       localStorage.setItem('ai_model', document.getElementById('ai-model').value.trim());
-      toast('AI 閰嶇疆宸蹭繚瀛橈紙涓庝富娴佺▼鍏变韩锛?, 'success');
+      toast('AI 配置已保存（与主流程共享）', 'success');
     }
     
     function getAIConfig() {
@@ -279,7 +279,7 @@
       };
     }
     
-    // ========== 缁熻鏇存柊 ==========
+    // ========== 统计更新 ==========
     function updateStats() {
       const manualCount = collectManualStories().length;
       const modifyCount = collectModifyItems().length;
@@ -288,7 +288,7 @@
       document.getElementById('stat-total').textContent = manualCount + modifyCount;
     }
     
-    // ========== 鎵嬪姩杈撳叆鏁呬簨 ==========
+    // ========== 手动输入故事 ==========
     let manualStoryCount = 0;
     
     function addManualStory(data = null) {
@@ -299,25 +299,25 @@
       div.id = `manual-${manualStoryCount}`;
       div.innerHTML = `
         <div class="story-card-header">
-          <h3>鏁呬簨 ${manualStoryCount}</h3>
-          <button class="btn btn-danger" style="padding:6px 12px;font-size:12px" onclick="removeManualStory(${manualStoryCount})">馃棏锔?鍒犻櫎</button>
+          <h3>故事 ${manualStoryCount}</h3>
+          <button class="btn btn-danger" style="padding:6px 12px;font-size:12px" onclick="removeManualStory(${manualStoryCount})">🗑️ 删除</button>
         </div>
         <div class="form-group">
-          <label>鏍囬</label>
-          <input type="text" class="manual-title" placeholder="鏁呬簨鏍囬" value="${data?.title || ''}" />
+          <label>标题</label>
+          <input type="text" class="manual-title" placeholder="故事标题" value="${data?.title || ''}" />
         </div>
         <div class="form-group">
-          <label>鏁呬簨鍐呭</label>
-          <textarea class="manual-story" placeholder="璇︾粏鎻忚堪鏁呬簨">${data?.story || ''}</textarea>
+          <label>故事内容</label>
+          <textarea class="manual-story" placeholder="详细描述故事">${data?.story || ''}</textarea>
         </div>
         <div class="form-group">
-          <label>鏍囩锛堢敤閫楀彿鍒嗛殧锛?/label>
-          <input type="text" class="manual-tags" placeholder="娓╂儏, 鎴愰暱, 鍙嶈浆" value="${data?.tags?.join(', ') || ''}" />
+          <label>标签（用逗号分隔）</label>
+          <input type="text" class="manual-tags" placeholder="温情, 成长, 反转" value="${data?.tags?.join(', ') || ''}" />
         </div>
       `;
       container.appendChild(div);
       
-      // 杈撳叆鍙樺寲鏃惰嚜鍔ㄤ繚瀛?
+      // 输入变化时自动保存
       div.querySelectorAll('input, textarea').forEach(el => {
         el.addEventListener('input', () => {
           saveToStorage();
@@ -355,7 +355,7 @@
       return stories;
     }
     
-    // ========== 淇敼璇勪环瀵规瘮 ==========
+    // ========== 修改评价对比 ==========
     let modifyCount = 0;
     
     function addModifyItem(data = null) {
@@ -366,35 +366,35 @@
       div.id = `modify-${modifyCount}`;
       div.innerHTML = `
         <div class="story-card-header">
-          <h3>瀵规瘮椤?${modifyCount}</h3>
-          <button class="btn btn-danger" style="padding:6px 12px;font-size:12px" onclick="removeModifyItem(${modifyCount})">馃棏锔?鍒犻櫎</button>
+          <h3>对比项 ${modifyCount}</h3>
+          <button class="btn btn-danger" style="padding:6px 12px;font-size:12px" onclick="removeModifyItem(${modifyCount})">🗑️ 删除</button>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
           <div>
             <div class="form-group">
-              <label>淇敼鍓嶏紙鍘熷鐗堟湰锛?/label>
-              <textarea class="modify-before" placeholder="鍘熷鏁呬簨鍐呭">${data?.before || ''}</textarea>
+              <label>修改前（原始版本）</label>
+              <textarea class="modify-before" placeholder="原始故事内容">${data?.before || ''}</textarea>
             </div>
             <div class="form-group">
-              <label>涓轰粈涔堜笉婊℃剰</label>
-              <textarea class="modify-before-reason" placeholder="鎻忚堪涓嶆弧鎰忕殑鍘熷洜">${data?.beforeReason || ''}</textarea>
+              <label>为什么不满意</label>
+              <textarea class="modify-before-reason" placeholder="描述不满意的原因">${data?.beforeReason || ''}</textarea>
             </div>
           </div>
           <div>
             <div class="form-group">
-              <label>淇敼鍚庯紙鏀硅繘鐗堟湰锛?/label>
-              <textarea class="modify-after" placeholder="淇敼鍚庣殑鏁呬簨鍐呭">${data?.after || ''}</textarea>
+              <label>修改后（改进版本）</label>
+              <textarea class="modify-after" placeholder="修改后的故事内容">${data?.after || ''}</textarea>
             </div>
             <div class="form-group">
-              <label>涓轰粈涔堟弧鎰?/label>
-              <textarea class="modify-after-reason" placeholder="鎻忚堪婊℃剰鐨勫師鍥?>${data?.afterReason || ''}</textarea>
+              <label>为什么满意</label>
+              <textarea class="modify-after-reason" placeholder="描述满意的原因">${data?.afterReason || ''}</textarea>
             </div>
           </div>
         </div>
       `;
       container.appendChild(div);
       
-      // 杈撳叆鍙樺寲鏃惰嚜鍔ㄤ繚瀛?
+      // 输入变化时自动保存
       div.querySelectorAll('input, textarea').forEach(el => {
         el.addEventListener('input', () => {
           saveToStorage();
@@ -432,7 +432,7 @@
       return items;
     }
     
-    // ========== 鏈湴瀛樺偍 ==========
+    // ========== 本地存储 ==========
     function saveToStorage() {
       const data = {
         manualStories: collectManualStories(),
@@ -451,14 +451,14 @@
           modifyItems = data.modifyItems || [];
         }
       } catch (e) {
-        console.error('鍔犺浇瀛樺偍鏁版嵁澶辫触', e);
+        console.error('加载存储数据失败', e);
       }
     }
     
-    // ========== 鏁版嵁绠＄悊鎸夐挳 ==========
+    // ========== 数据管理按钮 ==========
     function saveAllData() {
       saveToStorage();
-      toast('鏁版嵁宸蹭繚瀛樺埌娴忚鍣ㄦ湰鍦?, 'success');
+      toast('数据已保存到浏览器本地', 'success');
     }
     
     function loadAllData() {
@@ -466,7 +466,7 @@
       renderManualStories();
       renderModifyItems();
       updateStats();
-      toast('鏁版嵁宸叉仮澶?, 'success');
+      toast('数据已恢复', 'success');
     }
     
     function downloadDataFile() {
@@ -482,7 +482,7 @@
       a.download = `preference-data-${new Date().toISOString().slice(0,10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      toast('鏁版嵁鏂囦欢宸蹭笅杞?, 'success');
+      toast('数据文件已下载', 'success');
     }
     
     function importDataFile(event) {
@@ -500,28 +500,28 @@
           renderModifyItems();
           saveToStorage();
           updateStats();
-          toast('鏁版嵁瀵煎叆鎴愬姛', 'success');
+          toast('数据导入成功', 'success');
         } catch (err) {
-          toast('瀵煎叆澶辫触锛氭枃浠舵牸寮忛敊璇?, 'error');
+          toast('导入失败：文件格式错误', 'error');
         }
       };
       reader.readAsText(file);
       event.target.value = '';
     }
     
-    // ========== 鍋忓ソ鍒嗘瀽 ==========
+    // ========== 偏好分析 ==========
     async function analyzeAll() {
       const manual = collectManualStories();
       const modify = collectModifyItems();
       
       if (manual.length === 0 && modify.length === 0) {
-        toast('璇疯嚦灏戣緭鍏ヤ竴浜涙晠浜嬫垨瀵规瘮鏁版嵁', 'error');
+        toast('请至少输入一些故事或对比数据', 'error');
         return;
       }
       
       const cfg = getAIConfig();
       if (!cfg.apiKey) {
-        toast('璇峰厛閰嶇疆 AI 鎺ュ彛', 'error');
+        toast('请先配置 AI 接口', 'error');
         return;
       }
       
@@ -529,46 +529,46 @@
       btn.classList.add('loading');
       btn.disabled = true;
       
-      // 鏋勫缓缁煎悎鍒嗘瀽 prompt
-      let prompt = `浣犳槸涓€浣嶄笓涓氱殑鐢ㄦ埛鍋忓ソ鍒嗘瀽甯堛€?
-璇风患鍚堝垎鏋愪互涓嬫暟鎹紝鎬荤粨鐢ㄦ埛鐨勫垱浣滃亸濂姐€?
+      // 构建综合分析 prompt
+      let prompt = `你是一位专业的用户偏好分析师。
+请综合分析以下数据，总结用户的创作偏好。
 
 `;
       
       if (manual.length > 0) {
-        prompt += `銆愭墜鍔ㄨ緭鍏ョ殑鍠滄鐨勬晠浜嬨€?${manual.length} 涓?\n`;
+        prompt += `【手动输入的喜欢的故事】(${manual.length} 个)\n`;
         prompt += manual.map((s, i) => `
-銆愭晠浜?{i+1}銆?{s.title}
-鍐呭锛?{s.story}
-鏍囩锛?{s.tags?.join('銆?) || '鏃?}
+【故事${i+1}】${s.title}
+内容：${s.story}
+标签：${s.tags?.join('、') || '无'}
 `).join('\n');
         prompt += '\n\n';
       }
       
       if (modify.length > 0) {
-        prompt += `銆愪慨鏀瑰墠鍚庡姣旀暟鎹€?${modify.length} 缁?\n`;
+        prompt += `【修改前后对比数据】(${modify.length} 组)\n`;
         prompt += modify.map((item, i) => `
-銆愬姣?{i+1}銆?
-淇敼鍓嶏細${item.before}
-涓嶆弧鎰忓師鍥狅細${item.beforeReason}
-淇敼鍚庯細${item.after}
-婊℃剰鍘熷洜锛?{item.afterReason}
+【对比${i+1}】
+修改前：${item.before}
+不满意原因：${item.beforeReason}
+修改后：${item.after}
+满意原因：${item.afterReason}
 `).join('\n---\n');
       }
       
       prompt += `
 
-璇锋寜浠ヤ笅 JSON 鏍煎紡杈撳嚭锛屼笉瑕佸叾浠栨枃瀛楋細
+请按以下 JSON 格式输出，不要其他文字：
 {
-  "preferredThemes": ["鍋忓ソ涓婚1", "鍋忓ソ涓婚2"],
-  "avoidedThemes": ["閬垮厤涓婚1", "閬垮厤涓婚2"],
-  "visualStyle": "鐢婚鍊惧悜鎻忚堪锛堢畝鐭級",
-  "storyStructure": "鏁呬簨缁撴瀯鍋忓ソ鎻忚堪锛堢畝鐭級",
-  "narrativeStyle": "鍙欎簨椋庢牸鍋忓ソ锛堝锛氬弽杞€佹俯鎯呫€佸菇榛橈級",
-  "targetAudience": "鐩爣鍙椾紬鎺ㄦ柇",
-  "keyElements": ["鍏抽敭鍏冪礌1", "鍏抽敭鍏冪礌2"],
-  "coreConcepts": ["鏍稿績姒傚康1", "鏍稿績姒傚康2"],
-  "suggestions": "缁欑敤鎴风殑鍏蜂綋寤鸿"
+  "preferredThemes": ["偏好主题1", "偏好主题2"],
+  "avoidedThemes": ["避免主题1", "避免主题2"],
+  "visualStyle": "画风倾向描述（简短）",
+  "storyStructure": "故事结构偏好描述（简短）",
+  "narrativeStyle": "叙事风格偏好（如：反转、温情、幽默）",
+  "targetAudience": "目标受众推断",
+  "keyElements": ["关键元素1", "关键元素2"],
+  "coreConcepts": ["核心概念1", "核心概念2"],
+  "suggestions": "给用户的具体建议"
 }`;
       
       try {
@@ -586,7 +586,7 @@
         });
         
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error?.message || '鍒嗘瀽澶辫触');
+        if (!res.ok) throw new Error(data.error?.message || '分析失败');
         
         const reportText = data.choices[0].message.content;
         const report = JSON.parse(reportText);
@@ -598,9 +598,9 @@
         };
         
         displayResult();
-        toast('鍋忓ソ鍒嗘瀽瀹屾垚锛?, 'success');
+        toast('偏好分析完成！', 'success');
       } catch (e) {
-        toast('鍒嗘瀽澶辫触锛? + e.message, 'error');
+        toast('分析失败：' + e.message, 'error');
       } finally {
         btn.classList.remove('loading');
         btn.disabled = false;
@@ -613,37 +613,37 @@
       const container = document.getElementById('result-content');
       container.innerHTML = `
         <div class="preference-item">
-          <label>鍒嗘瀽鏃堕棿</label>
+          <label>分析时间</label>
           <span>${currentPreference.analyzedAt}</span>
         </div>
         <div class="preference-item">
-          <label>鏁版嵁鏉ユ簮</label>
-          <span>鎵嬪姩鏁呬簨 ${currentPreference.sourceCount.manual} 鏉?+ 瀵规瘮鏁版嵁 ${currentPreference.sourceCount.modify} 鏉?/span>
+          <label>数据来源</label>
+          <span>手动故事 ${currentPreference.sourceCount.manual} 条 + 对比数据 ${currentPreference.sourceCount.modify} 条</span>
         </div>
-        ${r.preferredThemes?.length ? `<div class="preference-item"><label>鉁?鍋忓ソ涓婚</label><span>${r.preferredThemes.join('銆?)}</span></div>` : ''}
-        ${r.avoidedThemes?.length ? `<div class="preference-item"><label>鉂?閬垮厤涓婚</label><span>${r.avoidedThemes.join('銆?)}</span></div>` : ''}
-        ${r.visualStyle ? `<div class="preference-item"><label>馃帹 鐢婚鍊惧悜</label><span>${r.visualStyle}</span></div>` : ''}
-        ${r.storyStructure ? `<div class="preference-item"><label>馃摉 鏁呬簨缁撴瀯</label><span>${r.storyStructure}</span></div>` : ''}
-        ${r.narrativeStyle ? `<div class="preference-item"><label>馃幁 鍙欎簨椋庢牸</label><span>${r.narrativeStyle}</span></div>` : ''}
-        ${r.targetAudience ? `<div class="preference-item"><label>馃懃 鐩爣鍙椾紬</label><span>${r.targetAudience}</span></div>` : ''}
-        ${r.keyElements?.length ? `<div class="preference-item"><label>馃攽 鍏抽敭鍏冪礌</label><span>${r.keyElements.join('銆?)}</span></div>` : ''}
-        ${r.coreConcepts?.length ? `<div class="preference-item"><label>馃挕 鏍稿績姒傚康</label><span>${r.coreConcepts.join('銆?)}</span></div>` : ''}
-        ${r.suggestions ? `<div class="preference-item"><label>馃摑 寤鸿</label><span>${r.suggestions}</span></div>` : ''}
+        ${r.preferredThemes?.length ? `<div class="preference-item"><label>✅ 偏好主题</label><span>${r.preferredThemes.join('、')}</span></div>` : ''}
+        ${r.avoidedThemes?.length ? `<div class="preference-item"><label>❌ 避免主题</label><span>${r.avoidedThemes.join('、')}</span></div>` : ''}
+        ${r.visualStyle ? `<div class="preference-item"><label>🎨 画风倾向</label><span>${r.visualStyle}</span></div>` : ''}
+        ${r.storyStructure ? `<div class="preference-item"><label>📖 故事结构</label><span>${r.storyStructure}</span></div>` : ''}
+        ${r.narrativeStyle ? `<div class="preference-item"><label>🎭 叙事风格</label><span>${r.narrativeStyle}</span></div>` : ''}
+        ${r.targetAudience ? `<div class="preference-item"><label>👥 目标受众</label><span>${r.targetAudience}</span></div>` : ''}
+        ${r.keyElements?.length ? `<div class="preference-item"><label>🔑 关键元素</label><span>${r.keyElements.join('、')}</span></div>` : ''}
+        ${r.coreConcepts?.length ? `<div class="preference-item"><label>💡 核心概念</label><span>${r.coreConcepts.join('、')}</span></div>` : ''}
+        ${r.suggestions ? `<div class="preference-item"><label>📝 建议</label><span>${r.suggestions}</span></div>` : ''}
       `;
       document.getElementById('result-panel').style.display = 'block';
     }
     
-    // ========== 瀵煎嚭 Skill ==========
+    // ========== 导出 Skill ==========
     function exportSkill() {
       if (!currentPreference) {
-        toast('璇峰厛杩涜鍋忓ソ鍒嗘瀽', 'error');
+        toast('请先进行偏好分析', 'error');
         return;
       }
       
       const r = currentPreference.report;
       const skill = {
-        name: "鐢ㄦ埛鏁呬簨鍋忓ソ",
-        description: "鍩轰簬鐢ㄦ埛鍘嗗彶鏁版嵁鐨勬晠浜嬪垱浣滃亸濂?,
+        name: "用户故事偏好",
+        description: "基于用户历史数据的故事创作偏好",
         version: "1.0",
         createdAt: new Date().toISOString(),
         preference: {
@@ -674,7 +674,7 @@
       a.download = `preference-skill-${new Date().toISOString().slice(0,10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      toast('Skill 鏂囦欢宸蹭笅杞?, 'success');
+      toast('Skill 文件已下载', 'success');
     }
     
     // ========== Toast ==========
