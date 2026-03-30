@@ -453,13 +453,25 @@
       <div class="progress-bar" style="margin-top:10px">
         <div class="progress-fill" id="ideas-progress" style="width:0%;background:var(--accent1)"></div>
       </div>
-      <div id="preference-display" style="margin-top:12px;padding:10px;background:rgba(124,106,247,0.1);border-radius:8px;font-size:12px;display:none">
+      <div id="preference-display" style="margin-top:12px;padding:10px;background:rgba(124,106,247,0.1);border-radius:8px;font-size:12px">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;color:var(--accent1);font-weight:600">
           <span>📊</span>
-          <span>当前偏好分析</span>
-          <a href="https://rui8kedang-cmyk.github.io/story-workflow/preference-tool.html" target="_blank" style="margin-left:auto;font-size:11px;color:var(--accent1);text-decoration:underline">偏好工具</a>
+          <span>偏好设置</span>
+          <a href="https://rui8kedang-cmyk.github.io/story-workflow/preference-tool.html" target="_blank" style="margin-left:auto;font-size:11px;color:var(--accent1);text-decoration:underline">打开偏好工具</a>
         </div>
-        <div id="preference-content"></div>
+        <div id="preference-content" style="display:none"></div>
+        <div id="preference-empty" style="color:var(--muted);font-size:11px">
+          <p style="margin-bottom:8px">未加载偏好文件。偏好可以提升头脑风暴的通过率。</p>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('skill-file-input').click()">
+              📤 上传 Skill 文件
+            </button>
+            <input type="file" id="skill-file-input" accept=".json" style="display:none" onchange="loadSkillFile(event)">
+            <button class="btn btn-ghost btn-sm" onclick="clearPreference()">
+              🗑️ 清除
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -657,23 +669,30 @@ async function runBrainstorm() {
   setBtnLoading(btn, true);
   setProgress('ideas-progress', 10);
 
-  // 拉取偏好报告
-  const pref = await loadPreferenceFromGitHub();
+  // 使用本地偏好
+  const pref = currentPreference;
   let prefText = '';
-  if (pref && pref.report) {
-    const r = pref.report;
-    prefText = `
+  if (pref) {
+    const r = pref.preference || pref.report;
+    if (r) {
+      prefText = `
 
 【用户偏好分析】
-（基于 ${pref.approvedCount} 个已批准 + ${pref.rejectedCount} 个已拒绝的创意）
-${r.preferredThemes ? `- 偏好主题：${r.preferredThemes.join('、')}` : ''}
-${r.avoidedThemes ? `- 避免主题：${r.avoidedThemes.join('、')}` : ''}
+${r.themes?.preferred?.length ? `- 偏好主题：${r.themes.preferred.join('、')}` : ''}
+${r.themes?.avoided?.length ? `- 避免主题：${r.themes.avoided.join('、')}` : ''}
+${r.preferredThemes?.length ? `- 偏好主题：${r.preferredThemes.join('、')}` : ''}
+${r.avoidedThemes?.length ? `- 避免主题：${r.avoidedThemes.join('、')}` : ''}
+${r.style?.visual ? `- 画风倾向：${r.style.visual}` : ''}
 ${r.visualStyle ? `- 画风倾向：${r.visualStyle}` : ''}
-${r.storyStructure ? `- 故事结构：${r.storyStructure}` : ''}
-${r.commonRejectionReasons ? `- 常见拒因：${r.commonRejectionReasons.join('、')}` : ''}
+${r.style?.narrative ? `- 叙事风格：${r.style.narrative}` : ''}
+${r.narrativeStyle ? `- 叙事风格：${r.narrativeStyle}` : ''}
+${r.elements?.length ? `- 关键元素：${r.elements.join('、')}` : ''}
+${r.keyElements?.length ? `- 关键元素：${r.keyElements.join('、')}` : ''}
+${r.coreConcepts?.length ? `- 核心概念：${r.coreConcepts.join('、')}` : ''}
 
 请严格按照上述偏好生成创意，避免踩坑。
 `;
+    }
   }
 
   const prompt = `你是一位极具创意的短视频故事策划师。
@@ -808,44 +827,102 @@ function rejectAll() {
 // ═══════════════════════════════════════════
 // 偏好分析
 // ═══════════════════════════════════════════
-const PREFERENCE_URL = 'https://raw.githubusercontent.com/rui8kedang-cmyk/story-workflow/main/preference-analysis.json';
+let currentPreference = null;
 
-async function loadPreferenceFromGitHub() {
+// 从 localStorage 加载已保存的偏好
+function loadPreferenceFromStorage() {
   try {
-    const res = await fetch(PREFERENCE_URL + '?t=' + Date.now());
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data;
+    const saved = localStorage.getItem('preference_skill');
+    if (saved) {
+      currentPreference = JSON.parse(saved);
+      return true;
+    }
   } catch (e) {
-    console.warn('拉取偏好报告失败', e);
-    return null;
+    console.warn('加载偏好失败', e);
   }
+  return false;
 }
 
+// 上传 skill 文件
+function loadSkillFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      // 支持 preference-analysis.json 和 preference-skill.json 两种格式
+      if (data.preference || data.report) {
+        currentPreference = data;
+        localStorage.setItem('preference_skill', JSON.stringify(data));
+        displayPreference(data);
+        showToast('偏好文件加载成功！', 'success');
+      } else {
+        showToast('文件格式不正确', 'error');
+      }
+    } catch (err) {
+      showToast('文件解析失败：' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// 显示偏好
 function displayPreference(data) {
-  const display = document.getElementById('preference-display');
   const content = document.getElementById('preference-content');
-  if (!data || !data.report) {
-    display.style.display = 'none';
+  const empty = document.getElementById('preference-empty');
+
+  if (!data) {
+    content.style.display = 'none';
+    empty.style.display = 'block';
     return;
   }
-  const r = data.report;
+
+  // 兼容两种格式
+  const r = data.preference || data.report;
+  if (!r) {
+    content.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
   content.innerHTML = `
-    <div style="margin-bottom:6px"><span style="color:var(--muted)">最后更新：</span>${data.analyzedAt}</div>
-    <div style="margin-bottom:4px"><span style="color:var(--muted)">样本统计：</span>已批准 ${data.approvedCount} 个｜已拒绝 ${data.rejectedCount} 个</div>
-    ${r.preferredThemes ? `<div style="margin-bottom:4px"><span style="color:var(--green)">✅ 偏好主题：</span>${r.preferredThemes.join('、')}</div>` : ''}
-    ${r.avoidedThemes ? `<div style="margin-bottom:4px"><span style="color:var(--red)">❌ 避免主题：</span>${r.avoidedThemes.join('、')}</div>` : ''}
+    <div style="margin-bottom:6px"><span style="color:var(--muted)">来源：</span>${data.name || '偏好分析'} ${data.metadata?.analyzedAt ? '· ' + data.metadata.analyzedAt : ''}</div>
+    ${r.themes?.preferred?.length ? `<div style="margin-bottom:4px"><span style="color:var(--green)">✅ 偏好主题：</span>${r.themes.preferred.join('、')}</div>` : ''}
+    ${r.themes?.avoided?.length ? `<div style="margin-bottom:4px"><span style="color:var(--red)">❌ 避免主题：</span>${r.themes.avoided.join('、')}</div>` : ''}
+    ${r.preferredThemes?.length ? `<div style="margin-bottom:4px"><span style="color:var(--green)">✅ 偏好主题：</span>${r.preferredThemes.join('、')}</div>` : ''}
+    ${r.avoidedThemes?.length ? `<div style="margin-bottom:4px"><span style="color:var(--red)">❌ 避免主题：</span>${r.avoidedThemes.join('、')}</div>` : ''}
+    ${r.style?.visual ? `<div style="margin-bottom:4px"><span style="color:var(--text)">🎨 画风倾向：</span>${r.style.visual}</div>` : ''}
     ${r.visualStyle ? `<div style="margin-bottom:4px"><span style="color:var(--text)">🎨 画风倾向：</span>${r.visualStyle}</div>` : ''}
-    ${r.storyStructure ? `<div style="margin-bottom:4px"><span style="color:var(--text)">📖 故事结构：</span>${r.storyStructure}</div>` : ''}
-    ${r.commonRejectionReasons ? `<div><span style="color:var(--muted)">🚫 常见拒因：</span>${r.commonRejectionReasons.join('、')}</div>` : ''}
+    ${r.style?.narrative ? `<div style="margin-bottom:4px"><span style="color:var(--text)">🎭 叙事风格：</span>${r.style.narrative}</div>` : ''}
+    ${r.narrativeStyle ? `<div style="margin-bottom:4px"><span style="color:var(--text)">🎭 叙事风格：</span>${r.narrativeStyle}</div>` : ''}
+    ${r.elements?.length ? `<div style="margin-bottom:4px"><span style="color:var(--text)">🔑 关键元素：</span>${r.elements.join('、')}</div>` : ''}
+    ${r.keyElements?.length ? `<div style="margin-bottom:4px"><span style="color:var(--text)">🔑 关键元素：</span>${r.keyElements.join('、')}</div>` : ''}
+    ${r.coreConcepts?.length ? `<div style="margin-bottom:4px"><span style="color:var(--text)">💡 核心概念：</span>${r.coreConcepts.join('、')}</div>` : ''}
+    ${r.suggestions ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)"><span style="color:var(--muted)">💡 建议：</span>${r.suggestions}</div>` : ''}
+    <div style="margin-top:8px">
+      <button class="btn btn-ghost btn-sm" onclick="clearPreference()">🗑️ 清除偏好</button>
+    </div>
   `;
-  display.style.display = 'block';
+  content.style.display = 'block';
+  empty.style.display = 'none';
 }
 
-// 页面加载时拉取 GitHub 上的偏好报告
-window.addEventListener('DOMContentLoaded', async () => {
-  const pref = await loadPreferenceFromGitHub();
-  if (pref) displayPreference(pref);
+// 清除偏好
+function clearPreference() {
+  currentPreference = null;
+  localStorage.removeItem('preference_skill');
+  displayPreference(null);
+  showToast('偏好已清除', 'success');
+}
+
+// 页面加载时恢复偏好
+window.addEventListener('DOMContentLoaded', () => {
+  if (loadPreferenceFromStorage()) {
+    displayPreference(currentPreference);
+  }
 });
 
 function clearIdeas() {
