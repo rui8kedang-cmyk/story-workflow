@@ -666,8 +666,15 @@ async function runBrainstorm() {
   const cfg = getCfg();
   const btn = document.getElementById('btn-brainstorm');
 
+  // 验证 AI 配置
+  if (!cfg.apiKey) {
+    toast('请先配置 AI 接口（点击右上角 ⚙️ 设置）', 'error');
+    return;
+  }
+
   setBtnLoading(btn, true);
   setProgress('ideas-progress', 10);
+  toast('🧠 正在生成创意...', 'success');
 
   // 使用本地偏好
   const pref = currentPreference;
@@ -735,13 +742,32 @@ ${cfg.reference || '（未指定，请自由发挥）'}${prefText}
     if (container.querySelector('.empty-state')) container.innerHTML = '';
 
     setProgress('ideas-progress', 30);
-    raw = await callAI([{ role: 'user', content: prompt }]);
+
+    try {
+      raw = await callAI([{ role: 'user', content: prompt }]);
+    } catch (apiErr) {
+      throw new Error('API 调用失败：' + apiErr.message);
+    }
+
     setProgress('ideas-progress', 80);
 
     // 提取JSON
     const match = raw.match(/\[[\s\S]*\]/);
-    if (!match) throw new Error('返回格式错误');
-    const ideas = JSON.parse(match[0]);
+    if (!match) {
+      console.error('AI 返回内容:', raw);
+      throw new Error('AI 返回格式错误，未能提取 JSON');
+    }
+
+    let ideas;
+    try {
+      ideas = JSON.parse(match[0]);
+    } catch (parseErr) {
+      throw new Error('JSON 解析失败：' + parseErr.message);
+    }
+
+    if (!Array.isArray(ideas) || ideas.length === 0) {
+      throw new Error('AI 未返回有效创意');
+    }
 
     ideas.forEach(idea => {
       idea.id = 'idea_' + Date.now() + '_' + Math.random().toString(36).slice(2);
@@ -755,6 +781,7 @@ ${cfg.reference || '（未指定，请自由发挥）'}${prefText}
     toast(`✨ 生成了 ${ideas.length} 个创意！`, 'success');
   } catch(e) {
     toast('生成失败：' + e.message, 'error');
+    console.error('头脑风暴错误:', e);
     setProgress('ideas-progress', 0);
   } finally {
     setBtnLoading(btn, false);
@@ -857,12 +884,12 @@ function loadSkillFile(event) {
         currentPreference = data;
         localStorage.setItem('preference_skill', JSON.stringify(data));
         displayPreference(data);
-        showToast('偏好文件加载成功！', 'success');
+        toast('偏好文件加载成功！', 'success');
       } else {
-        showToast('文件格式不正确', 'error');
+        toast('文件格式不正确', 'error');
       }
     } catch (err) {
-      showToast('文件解析失败：' + err.message, 'error');
+      toast('文件解析失败：' + err.message, 'error');
     }
   };
   reader.readAsText(file);
@@ -915,7 +942,7 @@ function clearPreference() {
   currentPreference = null;
   localStorage.removeItem('preference_skill');
   displayPreference(null);
-  showToast('偏好已清除', 'success');
+  toast('偏好已清除', 'success');
 }
 
 // 页面加载时恢复偏好
