@@ -151,7 +151,7 @@
       <!-- 主要操作 -->
       <div class="section-title" style="margin-top:24px">🎯 核心操作</div>
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="analyzeAll()">
+        <button class="btn btn-primary" id="btn-analyze" onclick="analyzeAll()">
           <span>🧠</span> 偏好分析
         </button>
         <button class="btn btn-success" onclick="exportSkill()">
@@ -523,13 +523,18 @@
       
       const cfg = getAIConfig();
       if (!cfg.apiKey) {
-        toast('请先配置 AI 接口', 'error');
+        toast('请先在主流程配置 AI 接口，或展开上方的 AI 配置栏', 'error');
         return;
       }
       
-      const btn = event.target;
-      btn.classList.add('loading');
+      const btn = document.getElementById('btn-analyze');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span>⏳</span> 分析中...';
       btn.disabled = true;
+      
+      // 显示加载状态
+      document.getElementById('result-panel').style.display = 'block';
+      document.getElementById('result-content').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">🔄 正在分析中，请稍候...</div>';
       
       // 构建综合分析 prompt
       let prompt = `你是一位专业的用户偏好分析师。
@@ -587,11 +592,31 @@
           })
         });
         
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error?.message || '分析失败');
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error?.message || `HTTP ${res.status}: ${res.statusText}`);
+        }
         
-        const reportText = data.choices[0].message.content;
-        const report = JSON.parse(reportText);
+        const data = await res.json();
+        const reportText = data.choices?.[0]?.message?.content;
+        
+        if (!reportText) {
+          throw new Error('AI 返回内容为空');
+        }
+        
+        // 尝试解析 JSON
+        let report;
+        try {
+          // 尝试提取 JSON 部分
+          const jsonMatch = reportText.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            report = JSON.parse(jsonMatch[0]);
+          } else {
+            report = JSON.parse(reportText);
+          }
+        } catch (parseErr) {
+          throw new Error('AI 返回格式错误，无法解析 JSON');
+        }
         
         currentPreference = {
           analyzedAt: new Date().toLocaleString(),
@@ -602,9 +627,10 @@
         displayResult();
         toast('偏好分析完成！', 'success');
       } catch (e) {
+        document.getElementById('result-content').innerHTML = `<div style="color:var(--red);padding:20px">❌ 分析失败：${e.message}<br><br><small style="color:var(--muted)">请检查 AI 配置是否正确</small></div>`;
         toast('分析失败：' + e.message, 'error');
       } finally {
-        btn.classList.remove('loading');
+        btn.innerHTML = originalText;
         btn.disabled = false;
       }
     }
