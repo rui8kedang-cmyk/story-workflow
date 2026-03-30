@@ -257,24 +257,25 @@
     }
     
     // ========== AI 閰嶇疆 ==========
+    // 浣跨敤涓绘祦绋嬬殑閰嶇疆 key锛屽疄鐜伴厤缃叡浜?
     function loadAIConfig() {
-      document.getElementById('ai-base-url').value = localStorage.getItem('pref_ai_base_url') || '';
-      document.getElementById('ai-api-key').value = localStorage.getItem('pref_ai_api_key') || '';
-      document.getElementById('ai-model').value = localStorage.getItem('pref_ai_model') || 'gpt-4o';
+      document.getElementById('ai-base-url').value = localStorage.getItem('ai_base_url') || '';
+      document.getElementById('ai-api-key').value = localStorage.getItem('ai_api_key') || '';
+      document.getElementById('ai-model').value = localStorage.getItem('ai_model') || 'gpt-4o';
     }
     
     function saveAIConfig() {
-      localStorage.setItem('pref_ai_base_url', document.getElementById('ai-base-url').value.trim());
-      localStorage.setItem('pref_ai_api_key', document.getElementById('ai-api-key').value.trim());
-      localStorage.setItem('pref_ai_model', document.getElementById('ai-model').value.trim());
-      toast('AI 閰嶇疆宸蹭繚瀛?, 'success');
+      localStorage.setItem('ai_base_url', document.getElementById('ai-base-url').value.trim());
+      localStorage.setItem('ai_api_key', document.getElementById('ai-api-key').value.trim());
+      localStorage.setItem('ai_model', document.getElementById('ai-model').value.trim());
+      toast('AI 閰嶇疆宸蹭繚瀛橈紙涓庝富娴佺▼鍏变韩锛?, 'success');
     }
     
     function getAIConfig() {
       return {
-        baseUrl: document.getElementById('ai-base-url').value.trim() || localStorage.getItem('pref_ai_base_url') || '',
-        apiKey: document.getElementById('ai-api-key').value.trim() || localStorage.getItem('pref_ai_api_key') || '',
-        model: document.getElementById('ai-model').value.trim() || localStorage.getItem('pref_ai_model') || 'gpt-4o'
+        baseUrl: document.getElementById('ai-base-url').value.trim() || localStorage.getItem('ai_base_url') || '',
+        apiKey: document.getElementById('ai-api-key').value.trim() || localStorage.getItem('ai_api_key') || '',
+        model: document.getElementById('ai-model').value.trim() || localStorage.getItem('ai_model') || 'gpt-4o'
       };
     }
     
