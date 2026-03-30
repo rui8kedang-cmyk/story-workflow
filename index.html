@@ -422,7 +422,8 @@
     </div>
 
     <div class="divider"></div>
-    <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="exportAll()">📥 导出全部数据</button>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="exportApprovedStories()">📥 导出已采纳故事</button>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px" onclick="exportAll()">导出全部数据</button>
     <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px" onclick="importData()">📤 导入数据</button>
     <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)" />
   </div>
@@ -451,6 +452,14 @@
       </div>
       <div class="progress-bar" style="margin-top:10px">
         <div class="progress-fill" id="ideas-progress" style="width:0%;background:var(--accent1)"></div>
+      </div>
+      <div id="preference-display" style="margin-top:12px;padding:10px;background:rgba(124,106,247,0.1);border-radius:8px;font-size:12px;display:none">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;color:var(--accent1);font-weight:600">
+          <span>📊</span>
+          <span>当前偏好分析</span>
+          <a href="https://rui8kedang-cmyk.github.io/story-workflow/preference-tool.html" target="_blank" style="margin-left:auto;font-size:11px;color:var(--accent1);text-decoration:underline">偏好工具</a>
+        </div>
+        <div id="preference-content"></div>
       </div>
     </div>
   </div>
@@ -648,6 +657,25 @@ async function runBrainstorm() {
   setBtnLoading(btn, true);
   setProgress('ideas-progress', 10);
 
+  // 拉取偏好报告
+  const pref = await loadPreferenceFromGitHub();
+  let prefText = '';
+  if (pref && pref.report) {
+    const r = pref.report;
+    prefText = `
+
+【用户偏好分析】
+（基于 ${pref.approvedCount} 个已批准 + ${pref.rejectedCount} 个已拒绝的创意）
+${r.preferredThemes ? `- 偏好主题：${r.preferredThemes.join('、')}` : ''}
+${r.avoidedThemes ? `- 避免主题：${r.avoidedThemes.join('、')}` : ''}
+${r.visualStyle ? `- 画风倾向：${r.visualStyle}` : ''}
+${r.storyStructure ? `- 故事结构：${r.storyStructure}` : ''}
+${r.commonRejectionReasons ? `- 常见拒因：${r.commonRejectionReasons.join('、')}` : ''}
+
+请严格按照上述偏好生成创意，避免踩坑。
+`;
+  }
+
   const prompt = `你是一位极具创意的短视频故事策划师。
 请基于以下信息，批量生成 ${cfg.batch} 个差异化的小故事创意，用于制作 ${cfg.durationMin}~${cfg.durationMax} 秒左右的短视频。
 
@@ -655,7 +683,7 @@ async function runBrainstorm() {
 ${cfg.background || '（未指定，请自由发挥）'}
 
 【竞品参考风格】
-${cfg.reference || '（未指定，请自由发挥）'}
+${cfg.reference || '（未指定，请自由发挥）'}${prefText}
 
 要求：
 - 每个创意必须在背景框架内，但角度和切入点要有明显差异
@@ -776,6 +804,50 @@ function rejectAll() {
   DB.ideas = DB.ideas.filter(i => i.status !== 'rejected');
   DB.save(); renderIdeas();
 }
+
+// ═══════════════════════════════════════════
+// 偏好分析
+// ═══════════════════════════════════════════
+const PREFERENCE_URL = 'https://raw.githubusercontent.com/rui8kedang-cmyk/story-workflow/main/preference-analysis.json';
+
+async function loadPreferenceFromGitHub() {
+  try {
+    const res = await fetch(PREFERENCE_URL + '?t=' + Date.now());
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data;
+  } catch (e) {
+    console.warn('拉取偏好报告失败', e);
+    return null;
+  }
+}
+
+function displayPreference(data) {
+  const display = document.getElementById('preference-display');
+  const content = document.getElementById('preference-content');
+  if (!data || !data.report) {
+    display.style.display = 'none';
+    return;
+  }
+  const r = data.report;
+  content.innerHTML = `
+    <div style="margin-bottom:6px"><span style="color:var(--muted)">最后更新：</span>${data.analyzedAt}</div>
+    <div style="margin-bottom:4px"><span style="color:var(--muted)">样本统计：</span>已批准 ${data.approvedCount} 个｜已拒绝 ${data.rejectedCount} 个</div>
+    ${r.preferredThemes ? `<div style="margin-bottom:4px"><span style="color:var(--green)">✅ 偏好主题：</span>${r.preferredThemes.join('、')}</div>` : ''}
+    ${r.avoidedThemes ? `<div style="margin-bottom:4px"><span style="color:var(--red)">❌ 避免主题：</span>${r.avoidedThemes.join('、')}</div>` : ''}
+    ${r.visualStyle ? `<div style="margin-bottom:4px"><span style="color:var(--text)">🎨 画风倾向：</span>${r.visualStyle}</div>` : ''}
+    ${r.storyStructure ? `<div style="margin-bottom:4px"><span style="color:var(--text)">📖 故事结构：</span>${r.storyStructure}</div>` : ''}
+    ${r.commonRejectionReasons ? `<div><span style="color:var(--muted)">🚫 常见拒因：</span>${r.commonRejectionReasons.join('、')}</div>` : ''}
+  `;
+  display.style.display = 'block';
+}
+
+// 页面加载时拉取 GitHub 上的偏好报告
+window.addEventListener('DOMContentLoaded', async () => {
+  const pref = await loadPreferenceFromGitHub();
+  if (pref) displayPreference(pref);
+});
+
 function clearIdeas() {
   if (!confirm('确定清空所有创意？')) return;
   DB.ideas = []; DB.save(); renderIdeas();
@@ -1238,6 +1310,25 @@ function exportAll() {
   a.download = `workflow_${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   toast('数据导出成功！', 'success');
+}
+
+function exportApprovedStories() {
+  const approved = DB.ideas.filter(i => i.status === 'approved');
+  if (approved.length === 0) {
+    toast('没有已批准的创意', 'error');
+    return;
+  }
+  const data = JSON.stringify({
+    exportTime: new Date().toLocaleString(),
+    count: approved.length,
+    stories: approved
+  }, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `approved-stories_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  toast(`已导出 ${approved.length} 个采纳故事！`, 'success');
 }
 
 function importData() { document.getElementById('import-file').click(); }
