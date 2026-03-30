@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎬 小故事创作工作流</title>
+  <style>
+    /* ─── 基础 ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #0d0f14;
+      --surface:  #161b24;
+      --surface2: #1e2535;
+      --border:   #2a3347;
+      --accent1:  #7c6af7;   /* 紫 – 头脑风暴 */
+      --accent2:  #3db8a4;   /* 青 – 剧本创作 */
+      --accent3:  #f5a623;   /* 橙 – 提示词 */
+      --green:    #4cca74;
+      --red:      #f05555;
+      --text:     #dce3f0;
+      --muted:    #6b7a99;
+      --radius:   12px;
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; min-height: 100vh; }
+
+    /* ─── 顶栏 ─── */
+    header {
+      display: flex; align-items: center; gap: 14px;
+      padding: 18px 32px;
+      background: linear-gradient(135deg, #1a1040 0%, #0d1a2e 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    header .logo { font-size: 26px; }
+    header h1 { font-size: 20px; font-weight: 700; letter-spacing: .5px; }
+    header .sub { font-size: 13px; color: var(--muted); margin-left: auto; }
+
+    /* ─── 管道图 ─── */
+    .pipeline {
+      display: flex; align-items: center; gap: 0;
+      padding: 20px 32px 10px;
+      overflow-x: auto;
+    }
+    .pipe-step {
+      display: flex; flex-direction: column; align-items: center;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px 20px; min-width: 130px;
+      cursor: pointer; transition: transform .15s, box-shadow .15s;
+      position: relative;
+    }
+    .pipe-step:hover { transform: translateY(-2px); box-shadow: 0 6px 24px #0008; }
+    .pipe-step.active { border-color: var(--active-color, var(--accent1)); box-shadow: 0 0 0 2px var(--active-color, var(--accent1))44; }
+    .pipe-step .icon { font-size: 24px; margin-bottom: 4px; }
+    .pipe-step .label { font-size: 13px; font-weight: 600; }
+    .pipe-step .count { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .pipe-arrow { font-size: 22px; color: var(--border); padding: 0 4px; flex-shrink: 0; }
+
+    /* ─── 主区域 ─── */
+    .main { display: flex; gap: 0; height: calc(100vh - 130px); }
+
+    /* ─── 面板通用 ─── */
+    .panel {
+      flex: 1; display: flex; flex-direction: column;
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .panel:last-child { border-right: none; }
+    .panel-header {
+      padding: 14px 20px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+      flex-shrink: 0;
+    }
+    .panel-header .ph-icon { font-size: 18px; }
+    .panel-header h2 { font-size: 15px; font-weight: 700; }
+    .panel-header .ph-badge {
+      margin-left: auto; font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 20px;
+    }
+    .panel-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .panel-footer { padding: 12px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+
+    /* 颜色主题 */
+    .panel-brainstorm .panel-header { background: #191030; }
+    .panel-brainstorm .panel-header h2 { color: var(--accent1); }
+    .panel-brainstorm .ph-badge { background: var(--accent1)22; color: var(--accent1); }
+
+    .panel-script .panel-header { background: #0e2420; }
+    .panel-script .panel-header h2 { color: var(--accent2); }
+    .panel-script .ph-badge { background: var(--accent2)22; color: var(--accent2); }
+
+    .panel-prompts .panel-header { background: #231a0e; }
+    .panel-prompts .panel-header h2 { color: var(--accent3); }
+    .panel-prompts .ph-badge { background: var(--accent3)22; color: var(--accent3); }
+
+    /* ─── 控制行 ─── */
+    .ctrl-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .ctrl-row input, .ctrl-row select, .ctrl-row textarea {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 8px; padding: 8px 12px;
+      font-size: 13px; outline: none; transition: border-color .2s;
+    }
+    .ctrl-row input:focus, .ctrl-row select:focus, .ctrl-row textarea:focus { border-color: var(--accent1); }
+    .ctrl-row input { flex: 1; }
+
+    /* ─── 按钮 ─── */
+    .btn {
+      padding: 8px 16px; border-radius: 8px; border: none;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: opacity .15s, transform .1s;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn:hover { opacity: .85; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn-primary  { background: var(--accent1); color: #fff; }
+    .btn-teal     { background: var(--accent2); color: #fff; }
+    .btn-orange   { background: var(--accent3); color: #fff; }
+    .btn-ghost    { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-sm       { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
+    .btn-danger   { background: var(--red)22; color: var(--red); border: 1px solid var(--red)44; }
+    .btn-success  { background: var(--green)22; color: var(--green); border: 1px solid var(--green)44; }
+
+    /* ─── 创意卡片 ─── */
+    .idea-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px 14px;
+      display: flex; flex-direction: column; gap: 6px;
+      transition: border-color .2s;
+      animation: fadeIn .3s ease;
+    }
+    .idea-card.approved { border-color: var(--green)88; background: #0a1f12; }
+    .idea-card.rejected { opacity: .4; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px) } to { opacity:1; transform:translateY(0) } }
+
+    .idea-card .ic-top { display: flex; align-items: flex-start; gap: 8px; }
+    .idea-card .ic-num { font-size: 11px; color: var(--muted); flex-shrink: 0; padding-top: 2px; }
+    .idea-card .ic-title { font-size: 14px; font-weight: 600; flex: 1; }
+    .idea-card .ic-body { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    .idea-card .ic-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .idea-card .tag {
+      font-size: 11px; padding: 2px 8px; border-radius: 20px;
+      background: var(--surface2); color: var(--muted);
+    }
+    .idea-card .ic-actions { display: flex; gap: 6px; margin-top: 4px; }
+    .idea-card .score-badge {
+      font-size: 11px; padding: 2px 8px; border-radius: 20px;
+      background: var(--accent1)22; color: var(--accent1); margin-left: auto;
+    }
+
+    /* ─── 剧本卡片 ─── */
+    .script-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+      animation: fadeIn .3s ease;
+    }
+    .script-card .sc-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; background: var(--surface2);
+      cursor: pointer;
+    }
+    .sc-header .sc-title { font-size: 13px; font-weight: 700; flex: 1; }
+    .sc-header .sc-dur { font-size: 11px; color: var(--muted); }
+    .sc-header .sc-toggle { font-size: 14px; color: var(--muted); }
+    .script-card .sc-body { padding: 12px 14px; display: none; flex-direction: column; gap: 8px; }
+    .script-card.expanded .sc-body { display: flex; }
+    .script-card.expanded .sc-toggle { transform: rotate(90deg); }
+
+    /* 分镜表格 */
+    .storyboard-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .storyboard-table th {
+      background: var(--surface2); padding: 7px 10px; text-align: left;
+      font-size: 11px; color: var(--muted); font-weight: 600;
+      border-bottom: 1px solid var(--border);
+    }
+    .storyboard-table td { padding: 8px 10px; border-bottom: 1px solid var(--border)66; vertical-align: top; line-height: 1.5; }
+    .storyboard-table tr:last-child td { border-bottom: none; }
+    .storyboard-table tr:hover td { background: var(--surface2)88; }
+    .shot-badge {
+      display: inline-block; font-size: 10px; padding: 1px 7px;
+      border-radius: 10px; background: var(--accent2)22; color: var(--accent2);
+      white-space: nowrap;
+    }
+
+    /* ─── 提示词卡片 ─── */
+    .prompt-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px 14px;
+      display: flex; flex-direction: column; gap: 8px;
+      animation: fadeIn .3s ease;
+    }
+    .prompt-card .pc-header { display: flex; align-items: center; gap: 8px; }
+    .prompt-card .pc-shot { font-size: 11px; color: var(--accent3); font-weight: 700; }
+    .prompt-card .pc-title { font-size: 13px; font-weight: 600; flex: 1; }
+    .prompt-card .pc-en {
+      font-size: 12px; color: #b0c4f0; background: #0d1625;
+      border-radius: 8px; padding: 10px 12px; line-height: 1.6;
+      border-left: 3px solid var(--accent3);
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .prompt-card .pc-meta { display: flex; gap: 10px; flex-wrap: wrap; }
+    .prompt-card .pc-tag {
+      font-size: 11px; padding: 2px 8px; border-radius: 20px;
+      background: var(--accent3)22; color: var(--accent3);
+    }
+
+    /* ─── 状态流 ─── */
+    .flow-indicator {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--muted); padding: 4px 0;
+    }
+    .fi-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+    .fi-dot.active { background: var(--green); box-shadow: 0 0 6px var(--green); }
+
+    /* ─── 配置行 ─── */
+    .config-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .config-row label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .config-row input[type=number] { width: 70px; }
+    .config-row select { min-width: 120px; }
+
+    /* ─── 空状态 ─── */
+    .empty-state {
+      text-align: center; padding: 40px 20px; color: var(--muted);
+    }
+    .empty-state .es-icon { font-size: 36px; margin-bottom: 10px; }
+    .empty-state p { font-size: 13px; }
+
+    /* ─── 加载动画 ─── */
+    .spinner {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid #ffffff44; border-top-color: #fff;
+      border-radius: 50%; animation: spin .6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── toast ─── */
+    #toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 9999; }
+    .toast {
+      padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 500;
+      background: var(--surface2); border: 1px solid var(--border);
+      box-shadow: 0 4px 20px #0008;
+      animation: toastIn .3s ease; max-width: 320px;
+    }
+    .toast.success { border-color: var(--green)66; color: var(--green); }
+    .toast.error   { border-color: var(--red)66; color: var(--red); }
+    .toast.info    { border-color: var(--accent1)66; color: var(--accent1); }
+    @keyframes toastIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+
+    /* ─── modal ─── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: #000b; display: none;
+      align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px; width: 560px; max-width: 95vw;
+      max-height: 80vh; overflow-y: auto; position: relative;
+    }
+    .modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+    .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; }
+
+    /* ─── textarea ─── */
+    textarea {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 8px; padding: 10px 12px;
+      font-size: 13px; outline: none; resize: vertical;
+      font-family: inherit; line-height: 1.6; width: 100%;
+    }
+    textarea:focus { border-color: var(--accent1); }
+
+    /* ─── 进度条 ─── */
+    .progress-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 2px; transition: width .4s ease; }
+
+    /* ─── 滚动条 ─── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* ─── API设置 ─── */
+    .api-config {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px;
+    }
+    .api-config h4 { font-size: 13px; font-weight: 600; margin-bottom: 10px; color: var(--muted); }
+
+    /* ─── 侧边配置 ─── */
+    .sidebar {
+      width: 280px; flex-shrink: 0; border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; overflow-y: auto;
+      padding: 16px;
+    }
+    .sidebar h3 { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: .8px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .form-group label { font-size: 12px; color: var(--muted); }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; }
+
+    .divider { height: 1px; background: var(--border); margin: 14px 0; }
+
+    @media (max-width: 900px) {
+      .main { flex-direction: column; height: auto; }
+      .panel { min-height: 400px; border-right: none; border-bottom: 1px solid var(--border); }
+      .sidebar { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── 顶栏 ─── -->
+<header>
+  <span class="logo">🎬</span>
+  <h1>小故事创作工作流</h1>
+  <span class="sub">Seedance 2.0 · 分镜提示词生产线</span>
+</header>
+
+<!-- ─── Toast容器 ─── -->
+<div id="toast-container"></div>
+
+<!-- ─── 管道图 ─── -->
+<div class="pipeline">
+  <div class="pipe-step" id="ps1" onclick="scrollPanel('brainstorm')" style="--active-color:var(--accent1)">
+    <span class="icon">💡</span>
+    <span class="label">头脑风暴</span>
+    <span class="count" id="ps1-count">0 个创意</span>
+  </div>
+  <span class="pipe-arrow">→</span>
+  <div class="pipe-step" id="ps2" onclick="scrollPanel('brainstorm')" style="--active-color:var(--accent1)">
+    <span class="icon">✅</span>
+    <span class="label">创意筛选</span>
+    <span class="count" id="ps2-count">0 已批准</span>
+  </div>
+  <span class="pipe-arrow">→</span>
+  <div class="pipe-step" id="ps3" onclick="scrollPanel('script')" style="--active-color:var(--accent2)">
+    <span class="icon">📝</span>
+    <span class="label">剧本创作</span>
+    <span class="count" id="ps3-count">0 个剧本</span>
+  </div>
+  <span class="pipe-arrow">→</span>
+  <div class="pipe-step" id="ps4" onclick="scrollPanel('script')" style="--active-color:var(--accent2)">
+    <span class="icon">🎞️</span>
+    <span class="label">分镜脚本</span>
+    <span class="count" id="ps4-count">0 个分镜</span>
+  </div>
+  <span class="pipe-arrow">→</span>
+  <div class="pipe-step" id="ps5" onclick="scrollPanel('prompts')" style="--active-color:var(--accent3)">
+    <span class="icon">✨</span>
+    <span class="label">提示词生成</span>
+    <span class="count" id="ps5-count">0 条提示词</span>
+  </div>
+</div>
+
+<!-- ─── 主区域 ─── -->
+<div class="main">
+
+  <!-- ═══════════════ 左：配置侧栏 ═══════════════ -->
+  <div class="sidebar">
+    <h3>⚙️ 全局配置</h3>
+
+    <div class="form-group">
+      <label>AI 接口地址</label>
+      <input type="text" id="cfg-base-url" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1" />
+    </div>
+    <div class="form-group">
+      <label>API Key</label>
+      <input type="password" id="cfg-api-key" placeholder="sk-..." />
+    </div>
+    <div class="form-group">
+      <label>模型</label>
+      <select id="cfg-model">
+        <option value="gpt-4o">GPT-4o</option>
+        <option value="gpt-4o-mini">GPT-4o-mini</option>
+        <option value="gpt-4-turbo">GPT-4-turbo</option>
+        <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+        <option value="deepseek-chat">DeepSeek Chat</option>
+        <option value="custom">自定义...</option>
+      </select>
+    </div>
+    <div class="form-group" id="custom-model-group" style="display:none">
+      <label>自定义模型名</label>
+      <input type="text" id="cfg-model-custom" placeholder="输入模型名称" />
+    </div>
+
+    <div class="divider"></div>
+    <h3>💡 头脑风暴</h3>
+    <div class="form-group">
+      <label>每次生成数量</label>
+      <input type="number" id="cfg-batch" value="5" min="1" max="20" />
+    </div>
+    <div class="form-group">
+      <label>基础故事背景</label>
+      <textarea id="cfg-background" rows="4" placeholder="描述故事发生的世界观、时代、核心人物设定等&#10;如：近未来都市，主角是一个失忆的外卖骑手"></textarea>
+    </div>
+    <div class="form-group">
+      <label>竞品参考（选填）</label>
+      <textarea id="cfg-reference" rows="3" placeholder="参考的短视频/影视作品风格&#10;如：《心灵奇旅》的温情感 + 抖音爆款反转结构"></textarea>
+    </div>
+
+    <div class="divider"></div>
+    <h3>🎞️ 视频配置</h3>
+    <div class="form-group">
+      <label>目标时长范围（秒）</label>
+      <div style="display:flex;align-items:center;gap:6px">
+        <input type="number" id="cfg-duration-min" value="30" min="5" max="600" style="flex:1" placeholder="最小" />
+        <span style="color:var(--muted);font-size:12px;flex-shrink:0">—</span>
+        <input type="number" id="cfg-duration-max" value="60" min="5" max="600" style="flex:1" placeholder="最大" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>每个分镜最大时长（秒）<span style="color:var(--muted);font-weight:400">，实际取 1 ~ 最大值</span></label>
+      <input type="number" id="cfg-shot-dur" value="5" min="1" max="30" />
+    </div>
+    <div class="form-group">
+      <label>画面比例</label>
+      <select id="cfg-ratio">
+        <option value="16:9">16:9 横屏</option>
+        <option value="9:16">9:16 竖屏</option>
+        <option value="1:1">1:1 方形</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>画风</label>
+      <input type="text" id="cfg-visual-style" placeholder="如：电影写实风格、日系动漫插画" value="电影写实风格" />
+    </div>
+
+    <div class="divider"></div>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="exportAll()">📥 导出全部数据</button>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px" onclick="importData()">📤 导入数据</button>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)" />
+  </div>
+
+  <!-- ═══════════════ 中左：头脑风暴 ═══════════════ -->
+  <div class="panel panel-brainstorm" id="panel-brainstorm">
+    <div class="panel-header">
+      <span class="ph-icon">💡</span>
+      <h2>头脑风暴 · 创意筛选</h2>
+      <span class="ph-badge" id="badge-ideas">0 个创意</span>
+    </div>
+    <div class="panel-body" id="ideas-list">
+      <div class="empty-state">
+        <div class="es-icon">💭</div>
+        <p>点击下方按钮，让 AI 批量生成故事创意</p>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <div class="ctrl-row">
+        <button class="btn btn-primary" id="btn-brainstorm" onclick="runBrainstorm()">
+          <span>⚡</span> 批量生成创意
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="approveAll()">全部批准</button>
+        <button class="btn btn-ghost btn-sm" onclick="rejectAll()">清空已拒</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearIdeas()">清空</button>
+      </div>
+      <div class="progress-bar" style="margin-top:10px">
+        <div class="progress-fill" id="ideas-progress" style="width:0%;background:var(--accent1)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ 中：剧本创作 ═══════════════ -->
+  <div class="panel panel-script" id="panel-script">
+    <div class="panel-header">
+      <span class="ph-icon">📝</span>
+      <h2>剧本创作 · 分镜脚本</h2>
+      <span class="ph-badge" id="badge-scripts">0 个剧本</span>
+    </div>
+    <div class="panel-body" id="scripts-list">
+      <div class="empty-state">
+        <div class="es-icon">📜</div>
+        <p>从左侧批准创意后，选择创意生成完整剧本与分镜</p>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <div class="ctrl-row" style="margin-bottom:8px">
+        <select id="select-approved-idea" style="flex:1">
+          <option value="">— 选择已批准的创意 —</option>
+        </select>
+      </div>
+      <div class="ctrl-row">
+        <button class="btn btn-teal" id="btn-script" onclick="runScriptCreation()">
+          <span>✍️</span> 生成剧本+分镜
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="clearScripts()">清空</button>
+      </div>
+      <div class="progress-bar" style="margin-top:10px">
+        <div class="progress-fill" id="scripts-progress" style="width:0%;background:var(--accent2)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ 右：提示词 ═══════════════ -->
+  <div class="panel panel-prompts" id="panel-prompts">
+    <div class="panel-header">
+      <span class="ph-icon">✨</span>
+      <h2>Seedance 提示词</h2>
+      <span class="ph-badge" id="badge-prompts">0 条提示词</span>
+    </div>
+    <div class="panel-body" id="prompts-list">
+      <div class="empty-state">
+        <div class="es-icon">🎬</div>
+        <p>从剧本生成分镜后，选择分镜生成 Seedance 2.0 提示词</p>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <div class="ctrl-row" style="margin-bottom:8px">
+        <select id="select-script" style="flex:1">
+          <option value="">— 选择分镜脚本 —</option>
+        </select>
+      </div>
+      <div class="ctrl-row">
+        <button class="btn btn-orange" id="btn-prompts" onclick="runPromptsGeneration()">
+          <span>🚀</span> 生成提示词
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="copyAllPrompts()">📋 复制全部</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearPrompts()">清空</button>
+      </div>
+      <div class="progress-bar" style="margin-top:10px">
+        <div class="progress-fill" id="prompts-progress" style="width:0%;background:var(--accent3)"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── 编辑Modal ─── -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('edit-modal')">✕</button>
+    <h3 id="edit-modal-title">编辑创意</h3>
+    <div id="edit-modal-body"></div>
+    <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('edit-modal')">取消</button>
+      <button class="btn btn-primary" id="edit-save-btn">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// 数据层
+// ═══════════════════════════════════════════
+const DB = {
+  ideas: [],
+  scripts: [],
+  prompts: [],
+  save() {
+    localStorage.setItem('workflow_data', JSON.stringify({
+      ideas: this.ideas,
+      scripts: this.scripts,
+      prompts: this.prompts
+    }));
+  },
+  load() {
+    const d = localStorage.getItem('workflow_data');
+    if (d) {
+      const parsed = JSON.parse(d);
+      this.ideas = parsed.ideas || [];
+      this.scripts = parsed.scripts || [];
+      this.prompts = parsed.prompts || [];
+    }
+  }
+};
+
+// ═══════════════════════════════════════════
+// 配置
+// ═══════════════════════════════════════════
+function getCfg() {
+  const model = document.getElementById('cfg-model').value;
+  const dMin = parseInt(document.getElementById('cfg-duration-min').value) || 30;
+  const dMax = parseInt(document.getElementById('cfg-duration-max').value) || 60;
+  const shotDurMax = parseInt(document.getElementById('cfg-shot-dur').value) || 5;
+  // 目标时长取范围内随机整数（生成时使用）；也保留 min/max 供 prompt 使用
+  const duration = dMin === dMax ? dMin : Math.floor(Math.random() * (dMax - dMin + 1)) + dMin;
+  return {
+    baseUrl: document.getElementById('cfg-base-url').value.trim().replace(/\/$/, ''),
+    apiKey: document.getElementById('cfg-api-key').value.trim(),
+    model: model === 'custom' ? document.getElementById('cfg-model-custom').value.trim() : model,
+    batch: parseInt(document.getElementById('cfg-batch').value) || 5,
+    background: document.getElementById('cfg-background').value.trim(),
+    reference: document.getElementById('cfg-reference').value.trim(),
+    durationMin: dMin,
+    durationMax: dMax,
+    duration,
+    shotDurMax,
+    ratio: document.getElementById('cfg-ratio').value,
+    visualStyle: document.getElementById('cfg-visual-style').value.trim(),
+  };
+}
+
+document.getElementById('cfg-model').addEventListener('change', function() {
+  document.getElementById('custom-model-group').style.display = this.value === 'custom' ? 'flex' : 'none';
+});
+
+// ═══════════════════════════════════════════
+// AI 调用核心
+// ═══════════════════════════════════════════
+async function callAI(messages, onChunk) {
+  const cfg = getCfg();
+  if (!cfg.apiKey) { toast('请先填写 API Key', 'error'); throw new Error('no key'); }
+
+  const res = await fetch(`${cfg.baseUrl}/chat/completions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.apiKey}` },
+    body: JSON.stringify({
+      model: cfg.model,
+      messages,
+      temperature: 0.9,
+      stream: !!onChunk
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`API Error ${res.status}: ${err}`);
+  }
+
+  if (onChunk) {
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let full = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = dec.decode(value);
+      for (const line of chunk.split('\n')) {
+        if (!line.startsWith('data:')) continue;
+        const data = line.slice(5).trim();
+        if (data === '[DONE]') continue;
+        try {
+          const delta = JSON.parse(data).choices?.[0]?.delta?.content || '';
+          full += delta;
+          onChunk(full);
+        } catch(e) {}
+      }
+    }
+    return full;
+  } else {
+    const json = await res.json();
+    return json.choices[0].message.content;
+  }
+}
+
+// ═══════════════════════════════════════════
+// 上游：头脑风暴
+// ═══════════════════════════════════════════
+async function runBrainstorm() {
+  const cfg = getCfg();
+  const btn = document.getElementById('btn-brainstorm');
+
+  setBtnLoading(btn, true);
+  setProgress('ideas-progress', 10);
+
+  const prompt = `你是一位极具创意的短视频故事策划师。
+请基于以下信息，批量生成 ${cfg.batch} 个差异化的小故事创意，用于制作 ${cfg.durationMin}~${cfg.durationMax} 秒左右的短视频。
+
+【基础故事背景】
+${cfg.background || '（未指定，请自由发挥）'}
+
+【竞品参考风格】
+${cfg.reference || '（未指定，请自由发挥）'}
+
+要求：
+- 每个创意必须在背景框架内，但角度和切入点要有明显差异
+- 如有竞品参考，需提炼其吸引人的结构/情绪，并在此基础上创新
+- 每个故事要有清晰的情感钩子，适合短视频传播
+
+每个创意必须包含：
+- 标题（简洁吸引人，≤15字）
+- 一句话核心概念（≤30字）
+- 故事简述（3-5句话，描述开头、高潮、结局）
+- 情绪标签（1-3个词，如：温情、悬疑、励志）
+- 视觉亮点（最适合拍摄的1-2个画面描述）
+- 创意评分（1-10分，基于故事创新度和视觉表现力）
+
+严格按照以下 JSON 格式输出，不要其他文字：
+[
+  {
+    "title": "...",
+    "concept": "...",
+    "story": "...",
+    "tags": ["...", "..."],
+    "visual": "...",
+    "score": 8
+  }
+]`;
+
+  try {
+    let raw = '';
+    const container = document.getElementById('ideas-list');
+    if (container.querySelector('.empty-state')) container.innerHTML = '';
+
+    setProgress('ideas-progress', 30);
+    raw = await callAI([{ role: 'user', content: prompt }]);
+    setProgress('ideas-progress', 80);
+
+    // 提取JSON
+    const match = raw.match(/\[[\s\S]*\]/);
+    if (!match) throw new Error('返回格式错误');
+    const ideas = JSON.parse(match[0]);
+
+    ideas.forEach(idea => {
+      idea.id = 'idea_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+      idea.status = 'pending'; // pending | approved | rejected
+      DB.ideas.push(idea);
+    });
+
+    DB.save();
+    renderIdeas();
+    setProgress('ideas-progress', 100);
+    toast(`✨ 生成了 ${ideas.length} 个创意！`, 'success');
+  } catch(e) {
+    toast('生成失败：' + e.message, 'error');
+    setProgress('ideas-progress', 0);
+  } finally {
+    setBtnLoading(btn, false);
+    setTimeout(() => setProgress('ideas-progress', 0), 1500);
+  }
+}
+
+function renderIdeas() {
+  const list = document.getElementById('ideas-list');
+  list.innerHTML = '';
+  if (DB.ideas.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="es-icon">💭</div><p>点击下方按钮，让 AI 批量生成故事创意</p></div>';
+    updatePipelineCounts();
+    return;
+  }
+
+  DB.ideas.forEach((idea, i) => {
+    const div = document.createElement('div');
+    div.className = `idea-card ${idea.status === 'approved' ? 'approved' : idea.status === 'rejected' ? 'rejected' : ''}`;
+    div.id = `idea-${idea.id}`;
+    div.innerHTML = `
+      <div class="ic-top">
+        <span class="ic-num">#${i + 1}</span>
+        <span class="ic-title">${escHtml(idea.title)}</span>
+        <span class="score-badge">⭐ ${idea.score}</span>
+      </div>
+      <div class="ic-body">${escHtml(idea.concept)}</div>
+      <div class="ic-body" style="color:#8899bb">${escHtml(idea.story)}</div>
+      <div class="ic-tags">
+        ${idea.tags.map(t => `<span class="tag">${escHtml(t)}</span>`).join('')}
+        ${idea.status === 'approved' ? '<span class="tag" style="background:var(--green)22;color:var(--green)">✓ 已批准</span>' : ''}
+        ${idea.status === 'rejected' ? '<span class="tag" style="background:var(--red)22;color:var(--red)">✗ 已拒绝</span>' : ''}
+      </div>
+      <div class="ic-body" style="font-size:11px;color:#6688aa">🎥 ${escHtml(idea.visual)}</div>
+      <div class="ic-actions">
+        <button class="btn btn-success btn-sm" onclick="approveIdea('${idea.id}')">✓ 批准</button>
+        <button class="btn btn-danger btn-sm" onclick="rejectIdea('${idea.id}')">✗ 拒绝</button>
+        <button class="btn btn-ghost btn-sm" onclick="editIdea('${idea.id}')">✏️ 编辑</button>
+        <button class="btn btn-ghost btn-sm" onclick="deleteIdea('${idea.id}')">🗑️</button>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+
+  updatePipelineCounts();
+  updateApprovedSelect();
+}
+
+function approveIdea(id) {
+  const idea = DB.ideas.find(i => i.id === id);
+  if (idea) { idea.status = 'approved'; DB.save(); renderIdeas(); }
+}
+function rejectIdea(id) {
+  const idea = DB.ideas.find(i => i.id === id);
+  if (idea) { idea.status = 'rejected'; DB.save(); renderIdeas(); }
+}
+function deleteIdea(id) {
+  DB.ideas = DB.ideas.filter(i => i.id !== id);
+  DB.save(); renderIdeas();
+}
+function approveAll() {
+  DB.ideas.forEach(i => { if (i.status !== 'rejected') i.status = 'approved'; });
+  DB.save(); renderIdeas();
+}
+function rejectAll() {
+  DB.ideas = DB.ideas.filter(i => i.status !== 'rejected');
+  DB.save(); renderIdeas();
+}
+function clearIdeas() {
+  if (!confirm('确定清空所有创意？')) return;
+  DB.ideas = []; DB.save(); renderIdeas();
+}
+
+function editIdea(id) {
+  const idea = DB.ideas.find(i => i.id === id);
+  if (!idea) return;
+  const modal = document.getElementById('edit-modal');
+  document.getElementById('edit-modal-title').textContent = '编辑创意';
+  document.getElementById('edit-modal-body').innerHTML = `
+    <div class="form-group"><label>标题</label><input id="ei-title" value="${escHtml(idea.title)}" /></div>
+    <div class="form-group"><label>核心概念</label><input id="ei-concept" value="${escHtml(idea.concept)}" /></div>
+    <div class="form-group"><label>故事简述</label><textarea id="ei-story" rows="4">${escHtml(idea.story)}</textarea></div>
+    <div class="form-group"><label>情绪标签（逗号分隔）</label><input id="ei-tags" value="${idea.tags.join('、')}" /></div>
+    <div class="form-group"><label>视觉亮点</label><textarea id="ei-visual" rows="2">${escHtml(idea.visual)}</textarea></div>
+    <div class="form-group"><label>评分（1-10）</label><input type="number" id="ei-score" value="${idea.score}" min="1" max="10" /></div>
+  `;
+  document.getElementById('edit-save-btn').onclick = () => {
+    idea.title = document.getElementById('ei-title').value;
+    idea.concept = document.getElementById('ei-concept').value;
+    idea.story = document.getElementById('ei-story').value;
+    idea.tags = document.getElementById('ei-tags').value.split(/[,，、]/).map(t => t.trim()).filter(Boolean);
+    idea.visual = document.getElementById('ei-visual').value;
+    idea.score = parseInt(document.getElementById('ei-score').value) || idea.score;
+    DB.save(); renderIdeas(); closeModal('edit-modal');
+    toast('创意已保存', 'success');
+  };
+  modal.classList.add('open');
+}
+
+function updateApprovedSelect() {
+  const sel = document.getElementById('select-approved-idea');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— 选择已批准的创意 —</option>';
+  DB.ideas.filter(i => i.status === 'approved').forEach(idea => {
+    const opt = document.createElement('option');
+    opt.value = idea.id;
+    opt.textContent = `${idea.title} (⭐${idea.score})`;
+    sel.appendChild(opt);
+  });
+  if (cur) sel.value = cur;
+}
+
+// ═══════════════════════════════════════════
+// 中游：剧本创作 + 分镜
+// ═══════════════════════════════════════════
+async function runScriptCreation() {
+  const cfg = getCfg();
+  const ideaId = document.getElementById('select-approved-idea').value;
+  if (!ideaId) { toast('请先选择一个已批准的创意', 'error'); return; }
+
+  const idea = DB.ideas.find(i => i.id === ideaId);
+  if (!idea) return;
+
+  const btn = document.getElementById('btn-script');
+  setBtnLoading(btn, true);
+  setProgress('scripts-progress', 10);
+
+  const shotCount = Math.floor(cfg.duration / Math.ceil(cfg.shotDurMax / 2));
+
+  const prompt = `你是一位专业的短视频剧本导演。
+根据以下故事创意，创作一个完整的短视频剧本，并分解为具体分镜脚本。
+
+【创意信息】
+标题：${idea.title}
+核心概念：${idea.concept}
+故事：${idea.story}
+视觉亮点：${idea.visual}
+
+【制作要求】
+- 总时长：${cfg.durationMin} ~ ${cfg.durationMax} 秒（在此范围内自由决定最合适的时长）
+- 分镜数量：约 ${shotCount} 个镜头
+- 每个分镜时长：1 ~ ${cfg.shotDurMax} 秒之间的整数，根据节奏自由分配，所有分镜时长之和须等于实际总时长
+- 画面比例：${cfg.ratio}
+- 整体情感节奏：开头建立情感→中段推进→结尾升华/反转
+
+请按以下 JSON 格式输出：
+{
+  "title": "${idea.title}",
+  "logline": "一句话故事梗概（≤40字）",
+  "theme": "核心主题",
+  "duration": 实际总时长（秒，整数，在 ${cfg.durationMin}~${cfg.durationMax} 范围内）,
+  "act1": "第一幕简述（建立情境，约占25%时长）",
+  "act2": "第二幕简述（发展冲突，约占50%时长）",
+  "act3": "第三幕简述（高潮结局，约占25%时长）",
+  "shots": [
+    {
+      "shotNum": 1,
+      "duration": 每镜实际时长（1~${cfg.shotDurMax} 的整数）,
+      "type": "镜头类型（如：特写/中景/全景/俯拍/跟镜）",
+      "action": "画面动作描述（具体人物动作/场景变化）",
+      "location": "场景地点",
+      "mood": "情绪氛围（如：温馨/紧张/悲伤）",
+      "narration": "旁白或对话（若有）",
+      "visualNote": "视觉创意备注"
+    }
+  ]
+}
+
+只输出 JSON，不要其他文字。`;
+
+  try {
+    setProgress('scripts-progress', 30);
+    const raw = await callAI([{ role: 'user', content: prompt }]);
+    setProgress('scripts-progress', 80);
+
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('返回格式错误');
+    const script = JSON.parse(match[0]);
+    script.id = 'script_' + Date.now();
+    script.ideaId = ideaId;
+    script.createdAt = new Date().toLocaleString();
+
+    DB.scripts.push(script);
+    DB.save();
+    renderScripts();
+    setProgress('scripts-progress', 100);
+    toast(`🎬 剧本创作完成！共 ${script.shots.length} 个分镜`, 'success');
+  } catch(e) {
+    toast('生成失败：' + e.message, 'error');
+    setProgress('scripts-progress', 0);
+  } finally {
+    setBtnLoading(btn, false);
+    setTimeout(() => setProgress('scripts-progress', 0), 1500);
+  }
+}
+
+function renderScripts() {
+  const list = document.getElementById('scripts-list');
+  list.innerHTML = '';
+
+  if (DB.scripts.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="es-icon">📜</div><p>从左侧批准创意后，选择创意生成完整剧本与分镜</p></div>';
+    updatePipelineCounts();
+    return;
+  }
+
+  DB.scripts.forEach((script, idx) => {
+    const div = document.createElement('div');
+    div.className = 'script-card';
+    div.id = `script-${script.id}`;
+
+    const shotRows = (script.shots || []).map(s => `
+      <tr>
+        <td><span class="shot-badge">S${s.shotNum}</span></td>
+        <td>${s.duration}s</td>
+        <td>${escHtml(s.type)}</td>
+        <td>${escHtml(s.location)}</td>
+        <td>${escHtml(s.action)}</td>
+        <td style="color:var(--accent2)">${escHtml(s.mood)}</td>
+      </tr>
+    `).join('');
+
+    div.innerHTML = `
+      <div class="sc-header" onclick="toggleScript('${script.id}')">
+        <span style="font-size:16px">🎬</span>
+        <div>
+          <div class="sc-title">${escHtml(script.title)}</div>
+          <div class="sc-dur" style="font-size:11px;color:var(--muted)">${escHtml(script.logline || '')}</div>
+        </div>
+        <span class="sc-dur">${script.duration}s · ${(script.shots||[]).length}镜</span>
+        <span class="sc-toggle">▶</span>
+      </div>
+      <div class="sc-body">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          <span style="font-size:12px;color:var(--muted)">主题：<span style="color:var(--text)">${escHtml(script.theme||'')}</span></span>
+          <span style="font-size:12px;color:var(--muted)">创作于：<span style="color:var(--text)">${script.createdAt||''}</span></span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+          <div style="background:var(--surface2);border-radius:8px;padding:10px">
+            <div style="font-size:11px;color:var(--accent1);font-weight:700;margin-bottom:4px">第一幕 · 建立</div>
+            <div style="font-size:12px;line-height:1.6">${escHtml(script.act1||'')}</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:8px;padding:10px">
+            <div style="font-size:11px;color:var(--accent2);font-weight:700;margin-bottom:4px">第二幕 · 发展</div>
+            <div style="font-size:12px;line-height:1.6">${escHtml(script.act2||'')}</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:8px;padding:10px">
+            <div style="font-size:11px;color:var(--accent3);font-weight:700;margin-bottom:4px">第三幕 · 高潮</div>
+            <div style="font-size:12px;line-height:1.6">${escHtml(script.act3||'')}</div>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="storyboard-table">
+            <thead><tr><th>镜号</th><th>时长</th><th>镜头</th><th>场景</th><th>动作</th><th>情绪</th></tr></thead>
+            <tbody>${shotRows}</tbody>
+          </table>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn btn-orange btn-sm" onclick="selectScriptForPrompts('${script.id}')">🚀 生成提示词</button>
+          <button class="btn btn-ghost btn-sm" onclick="deleteScript('${script.id}')">🗑️ 删除</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+
+  updatePipelineCounts();
+  updateScriptSelect();
+}
+
+function toggleScript(id) {
+  const el = document.getElementById(`script-${id}`);
+  el.classList.toggle('expanded');
+}
+
+function deleteScript(id) {
+  DB.scripts = DB.scripts.filter(s => s.id !== id);
+  DB.save(); renderScripts();
+}
+
+function selectScriptForPrompts(id) {
+  const sel = document.getElementById('select-script');
+  sel.value = id;
+  toast('已选择剧本，点击「生成提示词」', 'info');
+}
+
+function updateScriptSelect() {
+  const sel = document.getElementById('select-script');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— 选择分镜脚本 —</option>';
+  DB.scripts.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = `${s.title} (${s.duration}s · ${(s.shots||[]).length}镜)`;
+    sel.appendChild(opt);
+  });
+  if (cur) sel.value = cur;
+}
+
+function clearScripts() {
+  if (!confirm('确定清空所有剧本？')) return;
+  DB.scripts = []; DB.save(); renderScripts();
+}
+
+// ═══════════════════════════════════════════
+// 下游：提示词生成
+// ═══════════════════════════════════════════
+async function runPromptsGeneration() {
+  const cfg = getCfg();
+  const scriptId = document.getElementById('select-script').value;
+  if (!scriptId) { toast('请先选择一个分镜脚本', 'error'); return; }
+
+  const script = DB.scripts.find(s => s.id === scriptId);
+  if (!script) return;
+
+  const btn = document.getElementById('btn-prompts');
+  setBtnLoading(btn, true);
+  setProgress('prompts-progress', 10);
+
+  const shotsDesc = (script.shots || []).map(s =>
+    `镜号${s.shotNum}（${s.type}，${s.duration}s）：场景=${s.location}，动作=${s.action}，情绪=${s.mood}，备注=${s.visualNote||''}`
+  ).join('\n');
+
+  const prompt = `你是 Seedance 2.0 视频生成专家，擅长撰写精准的 AI 视频提示词。
+
+【剧本信息】
+标题：${script.title}
+主题：${script.theme}
+时长：${script.duration}秒
+画面比例：${cfg.ratio}
+画风：${cfg.visualStyle}
+
+【分镜列表】
+${shotsDesc}
+
+请为每个分镜生成一条高质量的 Seedance 2.0 英文提示词。
+
+Seedance 2.0 提示词规范：
+1. 使用英文，简洁精准
+2. 结构：[镜头类型] + [主体描述] + [动作/状态] + [场景/背景] + [光线/色彩] + [情绪/氛围] + [画风]
+3. 镜头类型：close-up / medium shot / wide shot / aerial shot / tracking shot / dolly zoom
+4. 必须包含动态描述词（如：slow zoom in, panning left, handheld shake）
+5. 避免使用 NSFW 内容
+6. 每条提示词 40-80 个单词
+
+严格按以下 JSON 格式输出：
+[
+  {
+    "shotNum": 1,
+    "shotType": "镜头类型中文",
+    "duration": 5,
+    "prompt_en": "Seedance 2.0 英文提示词",
+    "prompt_zh": "提示词中文翻译（帮助理解）",
+    "cameraMove": "运镜方式（英文）",
+    "mood": "情绪关键词"
+  }
+]
+
+只输出 JSON 数组，不要其他文字。`;
+
+  try {
+    setProgress('prompts-progress', 30);
+    const raw = await callAI([{ role: 'user', content: prompt }]);
+    setProgress('prompts-progress', 80);
+
+    const match = raw.match(/\[[\s\S]*\]/);
+    if (!match) throw new Error('返回格式错误');
+    const prompts = JSON.parse(match[0]);
+
+    const record = {
+      id: 'prompts_' + Date.now(),
+      scriptId,
+      scriptTitle: script.title,
+      visualStyle: cfg.visualStyle,
+      ratio: cfg.ratio,
+      createdAt: new Date().toLocaleString(),
+      shots: prompts
+    };
+
+    DB.prompts.push(record);
+    DB.save();
+    renderPrompts();
+    setProgress('prompts-progress', 100);
+    toast(`✨ 生成了 ${prompts.length} 条提示词！`, 'success');
+  } catch(e) {
+    toast('生成失败：' + e.message, 'error');
+    setProgress('prompts-progress', 0);
+  } finally {
+    setBtnLoading(btn, false);
+    setTimeout(() => setProgress('prompts-progress', 0), 1500);
+  }
+}
+
+function renderPrompts() {
+  const list = document.getElementById('prompts-list');
+  list.innerHTML = '';
+
+  if (DB.prompts.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="es-icon">🎬</div><p>从剧本生成分镜后，选择分镜生成 Seedance 2.0 提示词</p></div>';
+    updatePipelineCounts();
+    return;
+  }
+
+  DB.prompts.forEach(record => {
+    const groupDiv = document.createElement('div');
+    groupDiv.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)">
+        <span style="font-size:14px;font-weight:700">${escHtml(record.scriptTitle)}</span>
+        <span style="font-size:11px;color:var(--muted)">${record.ratio} · ${record.visualStyle}</span>
+        <span style="font-size:11px;color:var(--muted);margin-left:auto">${record.createdAt}</span>
+        <button class="btn btn-danger btn-sm" onclick="deletePromptRecord('${record.id}')">🗑️</button>
+      </div>
+    `;
+
+    (record.shots || []).forEach(shot => {
+      const div = document.createElement('div');
+      div.className = 'prompt-card';
+      div.innerHTML = `
+        <div class="pc-header">
+          <span class="pc-shot">镜头 ${shot.shotNum}</span>
+          <span class="pc-title">${escHtml(shot.shotType)} · ${shot.duration}s</span>
+          <button class="btn btn-ghost btn-sm" onclick="copyPrompt(this, \`${shot.prompt_en.replace(/`/g,"'")}\`)">📋</button>
+        </div>
+        <div class="pc-en">${escHtml(shot.prompt_en)}</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5">${escHtml(shot.prompt_zh)}</div>
+        <div class="pc-meta">
+          <span class="pc-tag">📷 ${escHtml(shot.cameraMove)}</span>
+          <span class="pc-tag">💫 ${escHtml(shot.mood)}</span>
+        </div>
+      `;
+      groupDiv.appendChild(div);
+    });
+
+    list.appendChild(groupDiv);
+  });
+
+  updatePipelineCounts();
+}
+
+function deletePromptRecord(id) {
+  DB.prompts = DB.prompts.filter(p => p.id !== id);
+  DB.save(); renderPrompts();
+}
+
+function copyPrompt(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✅';
+    setTimeout(() => btn.textContent = '📋', 1500);
+  });
+}
+
+function copyAllPrompts() {
+  const allPrompts = DB.prompts.flatMap(r =>
+    (r.shots||[]).map((s, i) => `// Shot ${s.shotNum}: ${s.shotType}\n${s.prompt_en}`)
+  );
+  if (!allPrompts.length) { toast('还没有提示词', 'error'); return; }
+  navigator.clipboard.writeText(allPrompts.join('\n\n')).then(() => {
+    toast(`✅ 已复制 ${allPrompts.length} 条提示词`, 'success');
+  });
+}
+
+function clearPrompts() {
+  if (!confirm('确定清空所有提示词？')) return;
+  DB.prompts = []; DB.save(); renderPrompts();
+}
+
+// ═══════════════════════════════════════════
+// 工具
+// ═══════════════════════════════════════════
+function updatePipelineCounts() {
+  const total = DB.ideas.length;
+  const approved = DB.ideas.filter(i => i.status === 'approved').length;
+  const scriptCount = DB.scripts.length;
+  const shotCount = DB.scripts.reduce((a, s) => a + (s.shots||[]).length, 0);
+  const promptCount = DB.prompts.reduce((a, p) => a + (p.shots||[]).length, 0);
+
+  document.getElementById('ps1-count').textContent = `${total} 个创意`;
+  document.getElementById('ps2-count').textContent = `${approved} 已批准`;
+  document.getElementById('ps3-count').textContent = `${scriptCount} 个剧本`;
+  document.getElementById('ps4-count').textContent = `${shotCount} 个分镜`;
+  document.getElementById('ps5-count').textContent = `${promptCount} 条提示词`;
+
+  document.getElementById('badge-ideas').textContent = `${total} 个创意`;
+  document.getElementById('badge-scripts').textContent = `${scriptCount} 个剧本`;
+  document.getElementById('badge-prompts').textContent = `${promptCount} 条提示词`;
+}
+
+function setBtnLoading(btn, loading) {
+  if (loading) {
+    btn.dataset.origText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span> 生成中...';
+    btn.disabled = true;
+  } else {
+    btn.innerHTML = btn.dataset.origText || btn.innerHTML;
+    btn.disabled = false;
+  }
+}
+
+function setProgress(id, pct) {
+  document.getElementById(id).style.width = pct + '%';
+}
+
+function toast(msg, type = 'info') {
+  const c = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  c.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function scrollPanel(p) {
+  document.getElementById(`panel-${p}`).scrollIntoView({ behavior: 'smooth', inline: 'center' });
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function exportAll() {
+  const data = JSON.stringify({ ideas: DB.ideas, scripts: DB.scripts, prompts: DB.prompts }, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `workflow_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  toast('数据导出成功！', 'success');
+}
+
+function importData() { document.getElementById('import-file').click(); }
+
+function handleImport(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.ideas) DB.ideas = data.ideas;
+      if (data.scripts) DB.scripts = data.scripts;
+      if (data.prompts) DB.prompts = data.prompts;
+      DB.save();
+      renderIdeas(); renderScripts(); renderPrompts();
+      toast('数据导入成功！', 'success');
+    } catch(e) {
+      toast('导入失败：格式错误', 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ═══════════════════════════════════════════
+// 初始化
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  DB.load();
+  renderIdeas();
+  renderScripts();
+  renderPrompts();
+  updatePipelineCounts();
+
+  // 加载保存的配置
+  const savedCfg = localStorage.getItem('workflow_config');
+  if (savedCfg) {
+    try {
+      const cfg = JSON.parse(savedCfg);
+      if (cfg.baseUrl) document.getElementById('cfg-base-url').value = cfg.baseUrl;
+      if (cfg.apiKey) document.getElementById('cfg-api-key').value = cfg.apiKey;
+      if (cfg.model) document.getElementById('cfg-model').value = cfg.model;
+    } catch(e) {}
+  }
+
+  // 自动保存配置
+  ['cfg-base-url', 'cfg-api-key', 'cfg-model'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+      localStorage.setItem('workflow_config', JSON.stringify({
+        baseUrl: document.getElementById('cfg-base-url').value,
+        apiKey: document.getElementById('cfg-api-key').value,
+        model: document.getElementById('cfg-model').value,
+      }));
+    });
+  });
+});
+</script>
+</body>
+</html>
