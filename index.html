@@ -423,9 +423,9 @@
 
     <div class="divider"></div>
     <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="exportApprovedStories()">📥 导出已采纳故事</button>
-    <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px" onclick="exportAll()">导出全部数据</button>
-    <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px" onclick="importData()">📤 导入数据</button>
-    <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)" />
+    <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px" onclick="exportPreset()">💾 导出预设配置</button>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px" onclick="importPreset()">📂 导入预设配置</button>
+    <input type="file" id="preset-file" accept=".json" style="display:none" onchange="handlePresetImport(event)" />
   </div>
 
   <!-- ═══════════════ 中左：头脑风暴 ═══════════════ -->
@@ -1406,14 +1406,36 @@ function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function exportAll() {
-  const data = JSON.stringify({ ideas: DB.ideas, scripts: DB.scripts, prompts: DB.prompts }, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
+function exportPreset() {
+  const preset = {
+    _type: 'story-workflow-preset',
+    _version: 1,
+    exportTime: new Date().toLocaleString(),
+    config: {
+      baseUrl: document.getElementById('cfg-base-url').value,
+      apiKey: document.getElementById('cfg-api-key').value,
+      model: document.getElementById('cfg-model').value,
+      modelCustom: document.getElementById('cfg-model-custom').value,
+    },
+    brainstorm: {
+      batch: document.getElementById('cfg-batch').value,
+      background: document.getElementById('cfg-background').value,
+      reference: document.getElementById('cfg-reference').value,
+    },
+    video: {
+      durationMin: document.getElementById('cfg-duration-min').value,
+      durationMax: document.getElementById('cfg-duration-max').value,
+      shotDur: document.getElementById('cfg-shot-dur').value,
+      ratio: document.getElementById('cfg-ratio').value,
+      visualStyle: document.getElementById('cfg-visual-style').value,
+    }
+  };
+  const blob = new Blob([JSON.stringify(preset, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `workflow_${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `preset_${new Date().toISOString().slice(0,10)}.json`;
   a.click();
-  toast('数据导出成功！', 'success');
+  toast('预设配置导出成功！', 'success');
 }
 
 function exportApprovedStories() {
@@ -1435,26 +1457,47 @@ function exportApprovedStories() {
   toast(`已导出 ${approved.length} 个采纳故事！`, 'success');
 }
 
-function importData() { document.getElementById('import-file').click(); }
+function importPreset() { document.getElementById('preset-file').click(); }
 
-function handleImport(e) {
+function handlePresetImport(e) {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = ev => {
     try {
-      const data = JSON.parse(ev.target.result);
-      if (data.ideas) DB.ideas = data.ideas;
-      if (data.scripts) DB.scripts = data.scripts;
-      if (data.prompts) DB.prompts = data.prompts;
-      DB.save();
-      renderIdeas(); renderScripts(); renderPrompts();
-      toast('数据导入成功！', 'success');
-    } catch(e) {
-      toast('导入失败：格式错误', 'error');
+      const preset = JSON.parse(ev.target.result);
+      if (preset._type !== 'story-workflow-preset') {
+        toast('文件格式不正确，请选择预设配置文件', 'error');
+        return;
+      }
+      if (preset.config) {
+        if (preset.config.baseUrl) document.getElementById('cfg-base-url').value = preset.config.baseUrl;
+        if (preset.config.apiKey) document.getElementById('cfg-api-key').value = preset.config.apiKey;
+        if (preset.config.model) {
+          document.getElementById('cfg-model').value = preset.config.model;
+          document.getElementById('custom-model-group').style.display = preset.config.model === 'custom' ? 'flex' : 'none';
+        }
+        if (preset.config.modelCustom) document.getElementById('cfg-model-custom').value = preset.config.modelCustom;
+      }
+      if (preset.brainstorm) {
+        if (preset.brainstorm.batch) document.getElementById('cfg-batch').value = preset.brainstorm.batch;
+        if (preset.brainstorm.background !== undefined) document.getElementById('cfg-background').value = preset.brainstorm.background;
+        if (preset.brainstorm.reference !== undefined) document.getElementById('cfg-reference').value = preset.brainstorm.reference;
+      }
+      if (preset.video) {
+        if (preset.video.durationMin) document.getElementById('cfg-duration-min').value = preset.video.durationMin;
+        if (preset.video.durationMax) document.getElementById('cfg-duration-max').value = preset.video.durationMax;
+        if (preset.video.shotDur) document.getElementById('cfg-shot-dur').value = preset.video.shotDur;
+        if (preset.video.ratio) document.getElementById('cfg-ratio').value = preset.video.ratio;
+        if (preset.video.visualStyle !== undefined) document.getElementById('cfg-visual-style').value = preset.video.visualStyle;
+      }
+      toast('预设配置导入成功！', 'success');
+    } catch(err) {
+      toast('文件解析失败：' + err.message, 'error');
     }
   };
   reader.readAsText(file);
+  e.target.value = '';
 }
 
 // ═══════════════════════════════════════════
