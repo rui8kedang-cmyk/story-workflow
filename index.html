@@ -422,10 +422,16 @@
     </div>
 
     <div class="divider"></div>
-    <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="exportApprovedStories()">📥 导出已采纳故事</button>
-    <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px" onclick="exportPreset()">💾 导出预设配置</button>
+    <h3>💾 预设管理</h3>
+    <div class="form-group">
+      <label>预设文件名</label>
+      <input type="text" id="cfg-preset-name" placeholder="如：艾迪星、土松嘟嘟" />
+    </div>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="exportPreset()">💾 导出预设配置</button>
     <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px" onclick="importPreset()">📂 导入预设配置</button>
     <input type="file" id="preset-file" accept=".json" style="display:none" onchange="handlePresetImport(event)" />
+    <div class="divider"></div>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="exportApprovedStories()">📥 导出已采纳故事</button>
   </div>
 
   <!-- ═══════════════ 中左：头脑风暴 ═══════════════ -->
@@ -1407,9 +1413,11 @@ function escHtml(s) {
 }
 
 function exportPreset() {
+  const presetName = document.getElementById('cfg-preset-name').value.trim();
   const preset = {
     _type: 'story-workflow-preset',
     _version: 1,
+    name: presetName || '',
     exportTime: new Date().toLocaleString(),
     config: {
       baseUrl: document.getElementById('cfg-base-url').value,
@@ -1433,9 +1441,11 @@ function exportPreset() {
   const blob = new Blob([JSON.stringify(preset, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `preset_${new Date().toISOString().slice(0,10)}.json`;
+  // 用预设名做文件名，没填就用日期
+  const safeName = presetName ? presetName.replace(/[\\/:*?"<>|]/g, '_') : new Date().toISOString().slice(0,10);
+  a.download = `preset_${safeName}.json`;
   a.click();
-  toast('预设配置导出成功！', 'success');
+  toast(`预设配置已导出：preset_${safeName}.json`, 'success');
 }
 
 function exportApprovedStories() {
@@ -1470,6 +1480,8 @@ function handlePresetImport(e) {
         toast('文件格式不正确，请选择预设配置文件', 'error');
         return;
       }
+      // 恢复预设名称
+      if (preset.name) document.getElementById('cfg-preset-name').value = preset.name;
       if (preset.config) {
         if (preset.config.baseUrl) document.getElementById('cfg-base-url').value = preset.config.baseUrl;
         if (preset.config.apiKey) document.getElementById('cfg-api-key').value = preset.config.apiKey;
