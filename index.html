@@ -895,7 +895,7 @@ ${cfg.reference || '（未指定，请自由发挥）'}${prefText}
 - 视觉亮点（最适合拍摄的1-2个画面描述）
 - 创意评分（1-10分，基于故事创新度和视觉表现力）
 
-严格按照以下 JSON 格式输出，不要其他文字：
+严格按照以下 JSON 格式输出，不要其他文字。所有字符串值必须用双引号包裹：
 [
   {
     "title": "...",
@@ -931,7 +931,7 @@ ${cfg.reference || '（未指定，请自由发挥）'}${prefText}
 
     let ideas;
     try {
-      ideas = JSON.parse(match[0]);
+      ideas = tryParseJSON(match[0]);
     } catch (parseErr) {
       addLog('err', '头脑风暴：JSON 解析失败', parseErr.message + '\n' + match[0].slice(0, 500));
       throw new Error('JSON 解析失败：' + parseErr.message);
@@ -1241,7 +1241,7 @@ async function runScriptCreation() {
     }
     let script;
     try {
-      script = JSON.parse(match[0]);
+      script = tryParseJSON(match[0]);
     } catch (parseErr) {
       addLog('err', '剧本创作：JSON 解析失败', parseErr.message + '\n' + match[0].slice(0, 500));
       throw parseErr;
@@ -1442,7 +1442,7 @@ Seedance 2.0 提示词规范：
     }
     let prompts;
     try {
-      prompts = JSON.parse(match[0]);
+      prompts = tryParseJSON(match[0]);
     } catch (parseErr) {
       addLog('err', '提示词生成：JSON 解析失败', parseErr.message + '\n' + match[0].slice(0, 500));
       throw parseErr;
@@ -1601,6 +1601,36 @@ function scrollPanel(p) {
 function escHtml(s) {
   if (!s) return '';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// JSON 修复：AI 有时输出不合规的 JSON（未加引号的中文值、尾逗号等）
+function tryParseJSON(raw) {
+  // 第一次直接尝试
+  try { return JSON.parse(raw); } catch(e) {}
+
+  let fixed = raw;
+
+  // 1) 修复未加引号的字符串值：  "key": 中文内容...
+  //    匹配 : 后面紧跟非 { [ " 数字 true/false/null 的内容
+  fixed = fixed.replace(/:\s*(?!\s*[{\["\d\-]|\s*true|\s*false|\s*null)([^,}\]]+?)\s*([,}\]])/g,
+    (m, val, end) => ': ' + JSON.stringify(val.trim()) + end
+  );
+
+  // 2) 去掉尾逗号  ,] 或 ,}
+  fixed = fixed.replace(/,\s*([}\]])/g, '$1');
+
+  // 3) 修复单引号字符串
+  // （仅在仍然失败时尝试：把 'xxx' 替换为 "xxx"）
+  try { return JSON.parse(fixed); } catch(e) {}
+
+  fixed = fixed.replace(/'([^']*?)'/g, '"$1"');
+  try { return JSON.parse(fixed); } catch(e) {}
+
+  // 4) 最后一搏：用 Function 方式（安全性可接受——数据来自 AI 返回）
+  try { return (new Function('return ' + raw))(); } catch(e) {}
+
+  // 全部失败，抛出原始错误
+  JSON.parse(raw);
 }
 
 function exportPreset() {
