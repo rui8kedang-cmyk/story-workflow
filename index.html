@@ -276,6 +276,56 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
+    /* ─── 日志面板 ─── */
+    #log-panel {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 0; max-height: 50vh;
+      background: #0a0c10; border-top: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      z-index: 8000; transition: height .25s ease;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    }
+    #log-panel.open { height: 280px; }
+    #log-panel .log-toolbar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 16px; background: #12151c;
+      border-bottom: 1px solid var(--border); flex-shrink: 0;
+      cursor: ns-resize; user-select: none;
+    }
+    #log-panel .log-toolbar .log-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+    #log-panel .log-toolbar .log-count { font-size: 11px; color: var(--muted); margin-left: 4px; }
+    #log-panel .log-toolbar .log-actions { margin-left: auto; display: flex; gap: 6px; }
+    #log-panel .log-toolbar .log-actions button {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      padding: 2px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;
+    }
+    #log-panel .log-toolbar .log-actions button:hover { color: var(--text); border-color: var(--text); }
+    #log-body {
+      flex: 1; overflow-y: auto; padding: 8px 16px;
+      font-size: 12px; line-height: 1.7;
+    }
+    .log-entry { padding: 4px 0; border-bottom: 1px solid #1a1e2a; display: flex; gap: 10px; align-items: flex-start; }
+    .log-entry:last-child { border-bottom: none; }
+    .log-time { color: #4a5568; flex-shrink: 0; white-space: nowrap; }
+    .log-tag {
+      padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700;
+      flex-shrink: 0; text-transform: uppercase; letter-spacing: .3px;
+    }
+    .log-tag.info { background: var(--accent1)22; color: var(--accent1); }
+    .log-tag.ok   { background: var(--green)22; color: var(--green); }
+    .log-tag.err  { background: var(--red)22; color: var(--red); }
+    .log-tag.warn { background: var(--accent3)22; color: var(--accent3); }
+    .log-msg { color: var(--text); word-break: break-all; flex: 1; }
+    .log-msg .log-detail { color: var(--muted); font-size: 11px; margin-top: 2px; word-break: break-word; white-space: pre-wrap; }
+    .log-badge {
+      position: absolute; top: -4px; right: -4px;
+      background: var(--red); color: #fff; font-size: 9px; font-weight: 700;
+      min-width: 16px; height: 16px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 4px;
+    }
+    #log-toggle { position: relative; }
+
     /* ─── API设置 ─── */
     .api-config {
       background: var(--surface); border: 1px solid var(--border);
@@ -310,6 +360,9 @@
   <span class="logo">🎬</span>
   <h1>小故事创作工作流</h1>
   <span class="sub">Seedance 2.0 · 分镜提示词生产线</span>
+  <button id="log-toggle" class="btn btn-ghost btn-sm" onclick="toggleLogPanel()" style="margin-left:12px;font-size:12px;position:relative">
+    📋 日志
+  </button>
 </header>
 
 <!-- ─── Toast容器 ─── -->
@@ -547,6 +600,20 @@
 
 </div>
 
+<!-- ─── 日志面板 ─── -->
+<div id="log-panel">
+  <div class="log-toolbar" onmousedown="startLogResize(event)">
+    <span class="log-title">📋 运行日志</span>
+    <span class="log-count" id="log-count">(0)</span>
+    <div class="log-actions">
+      <button onclick="clearLog()">清空</button>
+      <button onclick="copyLog()">复制</button>
+      <button onclick="toggleLogPanel()">✕ 关闭</button>
+    </div>
+  </div>
+  <div id="log-body"></div>
+</div>
+
 <!-- ─── 编辑Modal ─── -->
 <div class="modal-overlay" id="edit-modal">
   <div class="modal">
@@ -619,25 +686,120 @@ document.getElementById('cfg-model').addEventListener('change', function() {
 // ═══════════════════════════════════════════
 // AI 调用核心
 // ═══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// 日志系统（临时，刷新即清）
+// ═══════════════════════════════════════════
+const LOG = { entries: [], errorCount: 0 };
+
+function addLog(level, msg, detail) {
+  const now = new Date();
+  const ts = now.toTimeString().slice(0,8) + '.' + String(now.getMilliseconds()).padStart(3,'0');
+  LOG.entries.push({ ts, level, msg, detail: detail || '' });
+  if (level === 'err') LOG.errorCount++;
+
+  // 渲染到面板
+  const body = document.getElementById('log-body');
+  const div = document.createElement('div');
+  div.className = 'log-entry';
+  div.innerHTML = `
+    <span class="log-time">${ts}</span>
+    <span class="log-tag ${level}">${level}</span>
+    <span class="log-msg">${escHtml(msg)}${detail ? `<div class="log-detail">${escHtml(String(detail).slice(0, 2000))}</div>` : ''}</span>
+  `;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+
+  // 更新计数
+  document.getElementById('log-count').textContent = `(${LOG.entries.length})`;
+
+  // 错误时自动弹出面板 + 红点
+  if (level === 'err') {
+    const panel = document.getElementById('log-panel');
+    if (!panel.classList.contains('open')) panel.classList.add('open');
+    updateLogBadge();
+  }
+}
+
+function updateLogBadge() {
+  const btn = document.getElementById('log-toggle');
+  let badge = btn.querySelector('.log-badge');
+  if (LOG.errorCount > 0) {
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'log-badge';
+      btn.appendChild(badge);
+    }
+    badge.textContent = LOG.errorCount;
+  } else if (badge) {
+    badge.remove();
+  }
+}
+
+function toggleLogPanel() {
+  const panel = document.getElementById('log-panel');
+  panel.classList.toggle('open');
+  // 打开时清除红点
+  if (panel.classList.contains('open')) {
+    LOG.errorCount = 0;
+    updateLogBadge();
+  }
+}
+
+function clearLog() {
+  LOG.entries = []; LOG.errorCount = 0;
+  document.getElementById('log-body').innerHTML = '';
+  document.getElementById('log-count').textContent = '(0)';
+  updateLogBadge();
+}
+
+function copyLog() {
+  const text = LOG.entries.map(e => `[${e.ts}] [${e.level.toUpperCase()}] ${e.msg}${e.detail ? '\n  ' + e.detail : ''}`).join('\n');
+  navigator.clipboard.writeText(text || '(空)').then(() => toast('日志已复制', 'success'));
+}
+
+// 拖拽调整面板高度
+function startLogResize(e) {
+  if (e.target.tagName === 'BUTTON') return;
+  const panel = document.getElementById('log-panel');
+  if (!panel.classList.contains('open')) { panel.classList.add('open'); return; }
+  const startY = e.clientY;
+  const startH = panel.offsetHeight;
+  function onMove(ev) { const h = startH + (startY - ev.clientY); panel.style.height = Math.max(100, Math.min(window.innerHeight * 0.8, h)) + 'px'; }
+  function onUp() { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
 async function callAI(messages, onChunk) {
   const cfg = getCfg();
-  if (!cfg.apiKey) { toast('请先填写 API Key', 'error'); throw new Error('no key'); }
+  if (!cfg.apiKey) { addLog('err', 'API Key 未填写'); toast('请先填写 API Key', 'error'); throw new Error('no key'); }
 
-  const res = await fetch(`${cfg.baseUrl}/chat/completions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.apiKey}` },
-    body: JSON.stringify({
-      model: cfg.model,
-      messages,
-      temperature: 0.9,
-      stream: !!onChunk
-    })
-  });
+  const reqBody = { model: cfg.model, messages, temperature: 0.9, stream: !!onChunk };
+  addLog('info', `→ 请求 ${cfg.model}`, `URL: ${cfg.baseUrl}/chat/completions\nStream: ${!!onChunk}\nMessages: ${messages.length} 条 (${JSON.stringify(messages).length} chars)`);
+  const t0 = performance.now();
+
+  let res;
+  try {
+    res = await fetch(`${cfg.baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.apiKey}` },
+      body: JSON.stringify(reqBody)
+    });
+  } catch (netErr) {
+    const elapsed = ((performance.now() - t0) / 1000).toFixed(1);
+    addLog('err', `网络错误 (${elapsed}s)`, netErr.message);
+    throw netErr;
+  }
+
+  const elapsed = ((performance.now() - t0) / 1000).toFixed(1);
 
   if (!res.ok) {
     const err = await res.text();
+    addLog('err', `API 错误 ${res.status} (${elapsed}s)`, err.slice(0, 2000));
     throw new Error(`API Error ${res.status}: ${err}`);
   }
+
+  addLog('ok', `← 响应 ${res.status} (${elapsed}s)`);
 
   if (onChunk) {
     const reader = res.body.getReader();
@@ -658,10 +820,13 @@ async function callAI(messages, onChunk) {
         } catch(e) {}
       }
     }
+    addLog('ok', `← 流式完成 (${full.length} chars)`);
     return full;
   } else {
     const json = await res.json();
-    return json.choices[0].message.content;
+    const content = json.choices[0].message.content;
+    addLog('ok', `← 完成 (${content.length} chars, usage: ${JSON.stringify(json.usage || 'N/A')})`);
+    return content;
   }
 }
 
@@ -760,7 +925,7 @@ ${cfg.reference || '（未指定，请自由发挥）'}${prefText}
     // 提取JSON
     const match = raw.match(/\[[\s\S]*\]/);
     if (!match) {
-      console.error('AI 返回内容:', raw);
+      addLog('err', '头脑风暴：AI 返回格式错误，未能提取 JSON', raw.slice(0, 1000));
       throw new Error('AI 返回格式错误，未能提取 JSON');
     }
 
@@ -768,10 +933,12 @@ ${cfg.reference || '（未指定，请自由发挥）'}${prefText}
     try {
       ideas = JSON.parse(match[0]);
     } catch (parseErr) {
+      addLog('err', '头脑风暴：JSON 解析失败', parseErr.message + '\n' + match[0].slice(0, 500));
       throw new Error('JSON 解析失败：' + parseErr.message);
     }
 
     if (!Array.isArray(ideas) || ideas.length === 0) {
+      addLog('warn', '头脑风暴：AI 未返回有效创意');
       throw new Error('AI 未返回有效创意');
     }
 
@@ -784,8 +951,10 @@ ${cfg.reference || '（未指定，请自由发挥）'}${prefText}
     DB.save();
     renderIdeas();
     setProgress('ideas-progress', 100);
+    addLog('ok', `头脑风暴完成：生成 ${ideas.length} 个创意`);
     toast(`✨ 生成了 ${ideas.length} 个创意！`, 'success');
   } catch(e) {
+    addLog('err', '头脑风暴失败', e.message);
     toast('生成失败：' + e.message, 'error');
     console.error('头脑风暴错误:', e);
     setProgress('ideas-progress', 0);
@@ -1066,8 +1235,17 @@ async function runScriptCreation() {
     setProgress('scripts-progress', 80);
 
     const match = raw.match(/\{[\s\S]*\}/);
-    if (!match) throw new Error('返回格式错误');
-    const script = JSON.parse(match[0]);
+    if (!match) {
+      addLog('err', '剧本创作：AI 返回格式错误', raw.slice(0, 1000));
+      throw new Error('返回格式错误');
+    }
+    let script;
+    try {
+      script = JSON.parse(match[0]);
+    } catch (parseErr) {
+      addLog('err', '剧本创作：JSON 解析失败', parseErr.message + '\n' + match[0].slice(0, 500));
+      throw parseErr;
+    }
     script.id = 'script_' + Date.now();
     script.ideaId = ideaId;
     script.createdAt = new Date().toLocaleString();
@@ -1076,8 +1254,10 @@ async function runScriptCreation() {
     DB.save();
     renderScripts();
     setProgress('scripts-progress', 100);
+    addLog('ok', `剧本创作完成：『${script.title}』 ${script.shots.length} 个分镜`);
     toast(`🎬 剧本创作完成！共 ${script.shots.length} 个分镜`, 'success');
   } catch(e) {
+    addLog('err', '剧本创作失败', e.message);
     toast('生成失败：' + e.message, 'error');
     setProgress('scripts-progress', 0);
   } finally {
@@ -1256,8 +1436,17 @@ Seedance 2.0 提示词规范：
     setProgress('prompts-progress', 80);
 
     const match = raw.match(/\[[\s\S]*\]/);
-    if (!match) throw new Error('返回格式错误');
-    const prompts = JSON.parse(match[0]);
+    if (!match) {
+      addLog('err', '提示词生成：AI 返回格式错误', raw.slice(0, 1000));
+      throw new Error('返回格式错误');
+    }
+    let prompts;
+    try {
+      prompts = JSON.parse(match[0]);
+    } catch (parseErr) {
+      addLog('err', '提示词生成：JSON 解析失败', parseErr.message + '\n' + match[0].slice(0, 500));
+      throw parseErr;
+    }
 
     const record = {
       id: 'prompts_' + Date.now(),
@@ -1273,8 +1462,10 @@ Seedance 2.0 提示词规范：
     DB.save();
     renderPrompts();
     setProgress('prompts-progress', 100);
+    addLog('ok', `提示词生成完成：${prompts.length} 条`);
     toast(`✨ 生成了 ${prompts.length} 条提示词！`, 'success');
   } catch(e) {
+    addLog('err', '提示词生成失败', e.message);
     toast('生成失败：' + e.message, 'error');
     setProgress('prompts-progress', 0);
   } finally {
