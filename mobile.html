@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-<title>馃幀 灏忔晠浜嬪垱浣滃伐浣滄祦 路 鎵嬫満鐗?/title>
+<title>🎬 小故事创作工作流 · 手机版</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -15,7 +15,7 @@ html{font-size:14px}
 body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;
 min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
 
-/* 椤舵爮 */
+/* 顶栏 */
 header{display:flex;align-items:center;gap:10px;padding:12px 16px;
 background:linear-gradient(135deg,#1a1040,#0d1a2e);border-bottom:1px solid var(--border);
 position:fixed;top:0;left:0;right:0;z-index:100;height:52px}
@@ -23,7 +23,7 @@ header .logo{font-size:22px}
 header h1{font-size:16px;font-weight:700}
 header .hdr-right{margin-left:auto;display:flex;gap:8px;align-items:center}
 
-/* 杩涘害鐐?*/
+/* 进度点 */
 .progress-dots{display:flex;gap:6px;align-items:center;padding:10px 16px;
 background:var(--surface);border-bottom:1px solid var(--border);
 margin-top:52px;position:fixed;top:0;left:0;right:0;z-index:99;height:36px}
@@ -32,7 +32,7 @@ margin-top:52px;position:fixed;top:0;left:0;right:0;z-index:99;height:36px}
 .pdot.active{background:var(--accent1);box-shadow:0 0 6px var(--accent1)}
 .pdot-label{font-size:11px;color:var(--muted);margin-left:4px}
 
-/* 搴曢儴 Tab */
+/* 底部 Tab */
 .tab-bar{position:fixed;bottom:0;left:0;right:0;height:56px;display:flex;
 background:var(--surface);border-top:1px solid var(--border);z-index:100}
 .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -41,12 +41,12 @@ cursor:pointer;color:var(--muted);transition:color .2s;-webkit-tap-highlight-col
 .tab-item .tab-icon{font-size:20px;margin-bottom:2px}
 .tab-item .tab-label{font-size:11px;font-weight:600}
 
-/* 鍐呭鍖?*/
+/* 内容区 */
 .content{margin-top:88px;margin-bottom:56px;padding:12px 12px 20px;min-height:calc(100vh - 144px)}
 .tab-panel{display:none}
 .tab-panel.active{display:block}
 
-/* 鎸夐挳 */
+/* 按钮 */
 .btn{padding:10px 16px;border-radius:8px;border:none;font-size:14px;font-weight:600;
 cursor:pointer;display:inline-flex;align-items:center;gap:6px;min-height:44px;
 transition:opacity .15s}
@@ -60,7 +60,7 @@ transition:opacity .15s}
 .btn-success{background:rgba(76,202,116,.12);color:var(--green);border:1px solid rgba(76,202,116,.3)}
 .btn-block{width:100%;justify-content:center}
 
-/* 琛ㄥ崟 */
+/* 表单 */
 .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 .form-group label{font-size:12px;color:var(--muted)}
 .form-group input,.form-group select,.form-group textarea{
@@ -69,10 +69,9 @@ border-radius:8px;padding:10px 12px;font-size:14px;outline:none;min-height:44px}
 .form-group textarea{min-height:80px;resize:vertical}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent1)}
 
-/* 鍒涙剰鍗＄墖 */
+/* 创意卡片 */
 .idea-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-padding:14px;display:flex;flex-direction:column;gap:8px;margin-bottom:12px;
-animation:fadeIn .3s ease}
+padding:14px;display:flex;flex-direction:column;gap:8px;margin-bottom:12px;animation:fadeIn .3s ease}
 .idea-card.approved{border-color:rgba(76,202,116,.5);background:#0a1f12}
 .idea-card.rejected{opacity:.4}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -83,14 +82,12 @@ animation:fadeIn .3s ease}
 .idea-card .ic-tags{display:flex;gap:6px;flex-wrap:wrap}
 .tag{font-size:12px;padding:3px 10px;border-radius:20px;background:var(--surface2);color:var(--muted)}
 .idea-card .ic-actions{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap}
-.score-badge{font-size:12px;padding:3px 10px;border-radius:20px;
-background:rgba(124,106,247,.12);color:var(--accent1);margin-left:auto}
+.score-badge{font-size:12px;padding:3px 10px;border-radius:20px;background:rgba(124,106,247,.12);color:var(--accent1);margin-left:auto}
 
-/* 鍓ф湰鍗＄墖 */
+/* 剧本卡片 */
 .script-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
 overflow:hidden;margin-bottom:12px;animation:fadeIn .3s ease}
-.sc-header{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface2);
-cursor:pointer;min-height:48px}
+.sc-header{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface2);cursor:pointer;min-height:48px}
 .sc-header .sc-title{font-size:14px;font-weight:700;flex:1}
 .sc-header .sc-dur{font-size:12px;color:var(--muted)}
 .sc-header .sc-toggle{font-size:14px;color:var(--muted);transition:transform .2s}
@@ -98,7 +95,7 @@ cursor:pointer;min-height:48px}
 .script-card.expanded .sc-body{display:flex}
 .script-card.expanded .sc-toggle{transform:rotate(90deg)}
 
-/* 鍒嗛暅鍗＄墖锛堟墜鏈虹増鐢ㄥ崱鐗囦唬鏇胯〃鏍硷級 */
+/* 分镜卡片 */
 .shot-card{background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:8px}
 .shot-card .shot-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .shot-badge{display:inline-block;font-size:12px;padding:2px 8px;border-radius:10px;
@@ -106,28 +103,25 @@ background:rgba(61,184,164,.12);color:var(--accent2);white-space:nowrap;font-wei
 .shot-card .shot-info{font-size:13px;line-height:1.6;color:var(--text)}
 .shot-card .shot-meta{font-size:12px;color:var(--muted);margin-top:4px}
 
-/* 鎻愮ず璇嶅崱鐗?*/
+/* 提示词卡片 */
 .prompt-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-padding:14px;display:flex;flex-direction:column;gap:8px;margin-bottom:12px;
-animation:fadeIn .3s ease}
+padding:14px;display:flex;flex-direction:column;gap:8px;margin-bottom:12px;animation:fadeIn .3s ease}
 .prompt-card .pc-header{display:flex;align-items:center;gap:8px}
 .prompt-card .pc-shot{font-size:12px;color:var(--accent3);font-weight:700}
 .prompt-card .pc-title{font-size:14px;font-weight:600;flex:1}
 .prompt-card .pc-en{font-size:13px;color:#b0c4f0;background:#0d1625;border-radius:8px;
 padding:12px;line-height:1.6;border-left:3px solid var(--accent3);white-space:pre-wrap;word-break:break-word}
 .prompt-card .pc-meta{display:flex;gap:8px;flex-wrap:wrap}
-.prompt-card .pc-tag{font-size:12px;padding:3px 10px;border-radius:20px;
-background:rgba(245,166,35,.12);color:var(--accent3)}
+.prompt-card .pc-tag{font-size:12px;padding:3px 10px;border-radius:20px;background:rgba(245,166,35,.12);color:var(--accent3)}
 
-/* 閰嶇疆鎶藉眽 */
+/* 配置抽屉 */
 .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none}
 .drawer-overlay.open{display:block}
 .drawer{position:fixed;top:0;right:-85vw;bottom:0;width:85vw;max-width:360px;
 background:var(--surface);z-index:201;overflow-y:auto;padding:20px 16px;
 transition:right .3s ease;border-left:1px solid var(--border)}
 .drawer-overlay.open .drawer{right:0}
-.drawer h3{font-size:14px;font-weight:700;color:var(--muted);margin-bottom:12px;
-text-transform:uppercase;letter-spacing:.8px}
+.drawer h3{font-size:14px;font-weight:700;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px}
 .drawer .divider{height:1px;background:var(--border);margin:14px 0}
 .drawer .close-drawer{position:absolute;top:12px;right:12px;background:none;border:none;
 color:var(--muted);font-size:20px;cursor:pointer;min-height:44px;min-width:44px;
@@ -152,7 +146,7 @@ animation:toastIn .3s ease;pointer-events:auto}
 .toast.info{border-color:rgba(124,106,247,.4);color:var(--accent1)}
 @keyframes toastIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
 
-/* 鏃ュ織闈㈡澘 */
+/* 日志面板 */
 #log-panel{position:fixed;bottom:56px;left:0;right:0;height:0;max-height:50vh;
 background:#0a0c10;border-top:1px solid var(--border);display:flex;flex-direction:column;
 z-index:150;transition:height .25s ease;font-family:Consolas,Monaco,monospace}
@@ -162,8 +156,7 @@ border-bottom:1px solid var(--border);flex-shrink:0}
 .log-title{font-size:13px;font-weight:600;color:var(--text)}
 .log-count{font-size:12px;color:var(--muted)}
 .log-actions{margin-left:auto;display:flex;gap:8px}
-.log-actions button{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;
-min-height:36px;padding:4px 8px}
+.log-actions button{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;min-height:36px;padding:4px 8px}
 #log-body{flex:1;overflow-y:auto;padding:8px 12px;font-size:12px}
 .log-entry{margin-bottom:4px;display:flex;gap:6px;flex-wrap:wrap}
 .log-time{color:var(--muted);flex-shrink:0}
@@ -177,252 +170,210 @@ min-height:36px;padding:4px 8px}
 .log-badge{position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;
 background:var(--red);color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center}
 
-/* 杩涘害鏉?*/
+/* 进度条 */
 .progress-bar{height:3px;background:var(--surface2);border-radius:2px;overflow:hidden}
 .progress-fill{height:100%;transition:width .3s ease;border-radius:2px}
-
-/* 鍔犺浇 */
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);
 border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* 绌虹姸鎬?*/
 .empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
 .empty-state .es-icon{font-size:36px;margin-bottom:10px}
 .empty-state p{font-size:14px}
-
-/* 涓夊箷姒傝堪 */
 .acts-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
 .act-block{background:var(--surface2);border-radius:8px;padding:10px}
 .act-block .act-title{font-size:12px;font-weight:700;margin-bottom:4px}
 .act-block .act-body{font-size:13px;line-height:1.6}
 </style>
 </head>
-<body>
 
+<body>
 <header>
-<span class="logo">馃幀</span>
-<h1>鍒涗綔宸ヤ綔娴?/h1>
+<span class="logo">🎬</span>
+<h1>创作工作流</h1>
 <div class="hdr-right">
-<button class="btn btn-ghost btn-sm" id="log-toggle" onclick="toggleLogPanel()" style="position:relative;font-size:12px">馃搵</button>
-<button class="btn btn-ghost btn-sm" onclick="openDrawer()" style="font-size:16px">鈿欙笍</button>
+<button class="btn btn-ghost btn-sm" id="log-toggle" onclick="toggleLogPanel()" style="position:relative;font-size:12px">📋</button>
+<button class="btn btn-ghost btn-sm" onclick="openDrawer()" style="font-size:16px">⚙️</button>
 </div>
 </header>
 
 <div class="progress-dots">
-<span class="pdot" id="pd1"></span>
-<span class="pdot" id="pd2"></span>
-<span class="pdot" id="pd3"></span>
-<span class="pdot" id="pd4"></span>
-<span class="pdot" id="pd5"></span>
-<span class="pdot-label" id="pd-label">0 鍒涙剰</span>
+<span class="pdot" id="pd1"></span><span class="pdot" id="pd2"></span><span class="pdot" id="pd3"></span><span class="pdot" id="pd4"></span><span class="pdot" id="pd5"></span>
+<span class="pdot-label" id="pd-label">0 创意</span>
 </div>
 
 <div id="toast-container"></div>
 
-<!-- 閰嶇疆鎶藉眽 -->
+<!-- 配置抽屉 -->
 <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()">
 <div class="drawer" onclick="event.stopPropagation()">
-<button class="close-drawer" onclick="closeDrawer()">鉁?/button>
-<h3>鈿欙笍 鍏ㄥ眬閰嶇疆</h3>
-<div class="form-group"><label>AI 鎺ュ彛鍦板潃</label>
+<button class="close-drawer" onclick="closeDrawer()">✕</button>
+<h3>⚙️ 全局配置</h3>
+<div class="form-group"><label>AI 接口地址</label>
 <input type="text" id="cfg-base-url" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1"/></div>
 <div class="form-group"><label>API Key</label>
 <input type="password" id="cfg-api-key" placeholder="sk-..."/></div>
-<div class="form-group"><label>妯″瀷</label>
+<div class="form-group"><label>模型</label>
 <select id="cfg-model">
-<option value="gpt-4o">GPT-4o</option>
-<option value="gpt-4o-mini">GPT-4o-mini</option>
-<option value="gpt-4-turbo">GPT-4-turbo</option>
-<option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
-<option value="deepseek-chat">DeepSeek Chat</option>
-<option value="custom">鑷畾涔?..</option>
+<option value="gpt-4o">GPT-4o</option><option value="gpt-4o-mini">GPT-4o-mini</option>
+<option value="gpt-4-turbo">GPT-4-turbo</option><option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+<option value="deepseek-chat">DeepSeek Chat</option><option value="custom">自定义...</option>
 </select></div>
-<div class="form-group" id="custom-model-group" style="display:none"><label>鑷畾涔夋ā鍨嬪悕</label>
-<input type="text" id="cfg-model-custom" placeholder="杈撳叆妯″瀷鍚嶇О"/></div>
+<div class="form-group" id="custom-model-group" style="display:none"><label>自定义模型名</label>
+<input type="text" id="cfg-model-custom" placeholder="输入模型名称"/></div>
 <div class="divider"></div>
-<h3>馃挕 澶磋剳椋庢毚</h3>
-<div class="form-group"><label>姣忔鐢熸垚鏁伴噺</label>
+<h3>💡 头脑风暴</h3>
+<div class="form-group"><label>每次生成数量</label>
 <input type="number" id="cfg-batch" value="5" min="1" max="20"/></div>
-<div class="form-group"><label>鍩虹鏁呬簨鑳屾櫙</label>
-<textarea id="cfg-background" rows="3" placeholder="鎻忚堪鏁呬簨鍙戠敓鐨勪笘鐣岃銆佹椂浠ｃ€佹牳蹇冧汉鐗╄瀹氱瓑"></textarea></div>
-<div class="form-group"><label>绔炲搧鍙傝€冿紙閫夊～锛?/label>
-<textarea id="cfg-reference" rows="2" placeholder="鍙傝€冪殑鐭棰?褰辫浣滃搧椋庢牸"></textarea></div>
+<div class="form-group"><label>基础故事背景</label>
+<textarea id="cfg-background" rows="3" placeholder="描述故事发生的世界观、时代、核心人物设定等"></textarea></div>
+<div class="form-group"><label>竞品参考（选填）</label>
+<textarea id="cfg-reference" rows="2" placeholder="参考的短视频/影视作品风格"></textarea></div>
 <div class="divider"></div>
-<h3>馃幀 瑙嗛閰嶇疆</h3>
-<div class="form-group"><label>鐩爣鏃堕暱鑼冨洿锛堢锛?/label>
+<h3>🎬 视频配置</h3>
+<div class="form-group"><label>目标时长范围（秒）</label>
 <div style="display:flex;align-items:center;gap:6px">
 <input type="number" id="cfg-duration-min" value="30" min="5" max="600" style="flex:1"/>
-<span style="color:var(--muted);font-size:12px">鈥?/span>
+<span style="color:var(--muted);font-size:12px">—</span>
 <input type="number" id="cfg-duration-max" value="60" min="5" max="600" style="flex:1"/>
 </div></div>
-<div class="form-group"><label>姣忎釜鍒嗛暅鏈€澶ф椂闀匡紙绉掞級</label>
+<div class="form-group"><label>每个分镜最大时长（秒）</label>
 <input type="number" id="cfg-shot-dur" value="5" min="1" max="30"/></div>
-<div class="form-group"><label>鐢婚潰姣斾緥</label>
-<select id="cfg-ratio">
-<option value="16:9">16:9 妯睆</option>
-<option value="9:16">9:16 绔栧睆</option>
-<option value="1:1">1:1 鏂瑰舰</option>
-</select></div>
-<div class="form-group"><label>鐢婚</label>
-<input type="text" id="cfg-visual-style" placeholder="濡傦細鐢靛奖鍐欏疄椋庢牸" value="鐢靛奖鍐欏疄椋庢牸"/></div>
+<div class="form-group"><label>画面比例</label>
+<select id="cfg-ratio"><option value="16:9">16:9 横屏</option><option value="9:16">9:16 竖屏</option><option value="1:1">1:1 方形</option></select></div>
+<div class="form-group"><label>画风</label>
+<input type="text" id="cfg-visual-style" placeholder="如：电影写实风格" value="电影写实风格"/></div>
 <div class="divider"></div>
-<h3>馃捑 棰勮绠＄悊</h3>
-<div class="form-group"><label>棰勮鏂囦欢鍚?/label>
-<input type="text" id="cfg-preset-name" placeholder="濡傦細鑹捐开鏄熴€佸湡鏉惧槣鍢?/></div>
-<button class="btn btn-ghost btn-block" onclick="exportPreset()">馃捑 瀵煎嚭棰勮閰嶇疆</button>
-<button class="btn btn-ghost btn-block" style="margin-top:8px" onclick="importPreset()">馃搨 瀵煎叆棰勮閰嶇疆</button>
+<h3>💾 预设管理</h3>
+<div class="form-group"><label>预设文件名</label>
+<input type="text" id="cfg-preset-name" placeholder="如：艾迪星、土松嘟嘟"/></div>
+<button class="btn btn-ghost btn-block" onclick="exportPreset()">💾 导出预设配置</button>
+<button class="btn btn-ghost btn-block" style="margin-top:8px" onclick="importPreset()">📂 导入预设配置</button>
 <input type="file" id="preset-file" accept=".json" style="display:none" onchange="handlePresetImport(event)"/>
 <div class="divider"></div>
-<button class="btn btn-ghost btn-block" onclick="exportApprovedStories()">馃摜 瀵煎嚭宸查噰绾虫晠浜?/button>
+<button class="btn btn-ghost btn-block" onclick="exportApprovedStories()">📥 导出已采纳故事</button>
 </div>
 </div>
 
-<!-- 涓変釜 Tab 闈㈡澘 -->
+<!-- 内容区 -->
 <div class="content">
-
-<!-- === 鍒涙剰闈㈡澘 === -->
+<!-- 创意面板 -->
 <div class="tab-panel active" id="panel-ideas">
 <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-<span style="font-size:18px">馃挕</span>
-<h2 style="font-size:16px;font-weight:700;color:var(--accent1)">澶磋剳椋庢毚 路 鍒涙剰绛涢€?/h2>
+<span style="font-size:18px">💡</span>
+<h2 style="font-size:16px;font-weight:700;color:var(--accent1)">头脑风暴 · 创意筛选</h2>
 <span style="font-size:12px;padding:2px 8px;border-radius:20px;background:rgba(124,106,247,.12);color:var(--accent1);margin-left:auto" id="badge-ideas">0</span>
 </div>
-<div id="ideas-list">
-<div class="empty-state"><div class="es-icon">馃挱</div><p>鐐瑰嚮涓嬫柟鎸夐挳锛岃 AI 鎵归噺鐢熸垚鏁呬簨鍒涙剰</p></div>
-</div>
+<div id="ideas-list"><div class="empty-state"><div class="es-icon">💭</div><p>点击下方按钮，让 AI 批量生成故事创意</p></div></div>
 <div style="margin-top:12px">
-<button class="btn btn-primary btn-block" id="btn-brainstorm" onclick="runBrainstorm()">鈿?鎵归噺鐢熸垚鍒涙剰</button>
+<button class="btn btn-primary btn-block" id="btn-brainstorm" onclick="runBrainstorm()">⚡ 批量生成创意</button>
 <div style="display:flex;gap:8px;margin-top:8px">
-<button class="btn btn-ghost btn-sm" style="flex:1" onclick="approveAll()">鍏ㄩ儴鎵瑰噯</button>
-<button class="btn btn-ghost btn-sm" style="flex:1" onclick="rejectAll()">娓呯┖宸叉嫆</button>
-<button class="btn btn-ghost btn-sm" style="flex:1" onclick="clearIdeas()">娓呯┖</button>
+<button class="btn btn-ghost btn-sm" style="flex:1" onclick="approveAll()">全部批准</button>
+<button class="btn btn-ghost btn-sm" style="flex:1" onclick="rejectAll()">清空已拒</button>
+<button class="btn btn-ghost btn-sm" style="flex:1" onclick="clearIdeas()">清空</button>
 </div>
 <div class="progress-bar" style="margin-top:8px"><div class="progress-fill" id="ideas-progress" style="width:0%;background:var(--accent1)"></div></div>
 </div>
 <div style="margin-top:12px;padding:10px;background:rgba(124,106,247,.08);border-radius:8px">
 <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;color:var(--accent1);font-weight:600;font-size:13px">
-<span>馃搳</span><span>鍋忓ソ璁剧疆</span></div>
+<span>📊</span><span>偏好设置</span></div>
 <div id="preference-content" style="display:none;font-size:13px"></div>
 <div id="preference-empty" style="color:var(--muted);font-size:12px">
-<p style="margin-bottom:8px">鏈姞杞藉亸濂芥枃浠躲€?/p>
+<p style="margin-bottom:8px">未加载偏好文件。</p>
 <div style="display:flex;gap:8px">
-<button class="btn btn-ghost btn-sm" onclick="document.getElementById('skill-file-input').click()">馃摛 涓婁紶 Skill</button>
+<button class="btn btn-ghost btn-sm" onclick="document.getElementById('skill-file-input').click()">📤 上传 Skill</button>
 <input type="file" id="skill-file-input" accept=".json" style="display:none" onchange="loadSkillFile(event)">
-<button class="btn btn-ghost btn-sm" onclick="clearPreference()">馃棏锔?娓呴櫎</button>
-</div>
-</div>
-</div>
+<button class="btn btn-ghost btn-sm" onclick="clearPreference()">🗑️ 清除</button>
+</div></div></div>
 </div>
 
-<!-- === 鍓ф湰闈㈡澘 === -->
+<!-- 剧本面板 -->
 <div class="tab-panel" id="panel-scripts">
 <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-<span style="font-size:18px">馃摑</span>
-<h2 style="font-size:16px;font-weight:700;color:var(--accent2)">鍓ф湰鍒涗綔 路 鍒嗛暅</h2>
+<span style="font-size:18px">📝</span>
+<h2 style="font-size:16px;font-weight:700;color:var(--accent2)">剧本创作 · 分镜</h2>
 <span style="font-size:12px;padding:2px 8px;border-radius:20px;background:rgba(61,184,164,.12);color:var(--accent2);margin-left:auto" id="badge-scripts">0</span>
 </div>
-<div id="scripts-list">
-<div class="empty-state"><div class="es-icon">馃摐</div><p>浠庡垱鎰忛潰鏉挎壒鍑嗗垱鎰忓悗锛岄€夋嫨鍒涙剰鐢熸垚鍓ф湰</p></div>
-</div>
+<div id="scripts-list"><div class="empty-state"><div class="es-icon">📜</div><p>从创意面板批准创意后，选择创意生成剧本</p></div></div>
 <div style="margin-top:12px">
 <select id="select-approved-idea" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;font-size:14px;min-height:44px;margin-bottom:8px">
-<option value="">鈥?閫夋嫨宸叉壒鍑嗙殑鍒涙剰 鈥?/option>
-</select>
+<option value="">— 选择已批准的创意 —</option></select>
 <div style="display:flex;gap:8px">
-<button class="btn btn-teal" style="flex:1" id="btn-script" onclick="runScriptCreation()">鉁嶏笍 鐢熸垚鍓ф湰+鍒嗛暅</button>
-<button class="btn btn-ghost btn-sm" onclick="clearScripts()">娓呯┖</button>
+<button class="btn btn-teal" style="flex:1" id="btn-script" onclick="runScriptCreation()">✍️ 生成剧本+分镜</button>
+<button class="btn btn-ghost btn-sm" onclick="clearScripts()">清空</button>
 </div>
 <div class="progress-bar" style="margin-top:8px"><div class="progress-fill" id="scripts-progress" style="width:0%;background:var(--accent2)"></div></div>
 </div>
 </div>
 
-<!-- === 鎻愮ず璇嶉潰鏉?=== -->
+<!-- 提示词面板 -->
 <div class="tab-panel" id="panel-prompts">
 <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-<span style="font-size:18px">鉁?/span>
-<h2 style="font-size:16px;font-weight:700;color:var(--accent3)">Seedance 鎻愮ず璇?/h2>
+<span style="font-size:18px">✨</span>
+<h2 style="font-size:16px;font-weight:700;color:var(--accent3)">Seedance 提示词</h2>
 <span style="font-size:12px;padding:2px 8px;border-radius:20px;background:rgba(245,166,35,.12);color:var(--accent3);margin-left:auto" id="badge-prompts">0</span>
 </div>
-<div id="prompts-list">
-<div class="empty-state"><div class="es-icon">馃幀</div><p>浠庡墽鏈敓鎴愬垎闀滃悗锛岄€夋嫨鍒嗛暅鐢熸垚鎻愮ず璇?/p></div>
-</div>
+<div id="prompts-list"><div class="empty-state"><div class="es-icon">🎬</div><p>从剧本生成分镜后，选择分镜生成提示词</p></div></div>
 <div style="margin-top:12px">
 <select id="select-script" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;font-size:14px;min-height:44px;margin-bottom:8px">
-<option value="">鈥?閫夋嫨鍒嗛暅鑴氭湰 鈥?/option>
-</select>
+<option value="">— 选择分镜脚本 —</option></select>
 <div style="display:flex;gap:8px">
-<button class="btn btn-orange" style="flex:1" id="btn-prompts" onclick="runPromptsGeneration()">馃殌 鐢熸垚鎻愮ず璇?/button>
-<button class="btn btn-ghost btn-sm" onclick="copyAllPrompts()">馃搵 澶嶅埗鍏ㄩ儴</button>
-<button class="btn btn-ghost btn-sm" onclick="clearPrompts()">娓呯┖</button>
+<button class="btn btn-orange" style="flex:1" id="btn-prompts" onclick="runPromptsGeneration()">🚀 生成提示词</button>
+<button class="btn btn-ghost btn-sm" onclick="copyAllPrompts()">📋 复制全部</button>
+<button class="btn btn-ghost btn-sm" onclick="clearPrompts()">清空</button>
 </div>
 <div class="progress-bar" style="margin-top:8px"><div class="progress-fill" id="prompts-progress" style="width:0%;background:var(--accent3)"></div></div>
 </div>
 </div>
+</div>
 
-</div><!-- end .content -->
-
-<!-- 缂栬緫Modal -->
+<!-- 编辑Modal -->
 <div class="modal-overlay" id="edit-modal">
 <div class="modal">
-<h3 id="edit-modal-title">缂栬緫鍒涙剰</h3>
+<h3 id="edit-modal-title">编辑创意</h3>
 <div id="edit-modal-body"></div>
 <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
-<button class="btn btn-ghost" onclick="closeModal('edit-modal')">鍙栨秷</button>
-<button class="btn btn-primary" id="edit-save-btn">淇濆瓨</button>
-</div>
-</div>
-</div>
+<button class="btn btn-ghost" onclick="closeModal('edit-modal')">取消</button>
+<button class="btn btn-primary" id="edit-save-btn">保存</button>
+</div></div></div>
 
-<!-- TAB BAR -->
+<!-- Tab Bar -->
 <div class="tab-bar">
-<div class="tab-item active" onclick="switchTab('ideas')" id="tab-ideas">
-<span class="tab-icon">馃挕</span><span class="tab-label">鍒涙剰</span>
-</div>
-<div class="tab-item" onclick="switchTab('scripts')" id="tab-scripts">
-<span class="tab-icon">馃摑</span><span class="tab-label">鍓ф湰</span>
-</div>
-<div class="tab-item" onclick="switchTab('prompts')" id="tab-prompts">
-<span class="tab-icon">鉁?/span><span class="tab-label">鎻愮ず璇?/span>
-</div>
+<div class="tab-item active" onclick="switchTab('ideas')" id="tab-ideas"><span class="tab-icon">💡</span><span class="tab-label">创意</span></div>
+<div class="tab-item" onclick="switchTab('scripts')" id="tab-scripts"><span class="tab-icon">📝</span><span class="tab-label">剧本</span></div>
+<div class="tab-item" onclick="switchTab('prompts')" id="tab-prompts"><span class="tab-icon">✨</span><span class="tab-label">提示词</span></div>
 </div>
 
-<!-- LOG PANEL -->
+<!-- 日志面板 -->
 <div id="log-panel">
 <div class="log-toolbar">
-<span class="log-title">馃搵 杩愯鏃ュ織</span>
-<span class="log-count" id="log-count">(0)</span>
-<div class="log-actions">
-<button onclick="clearLog()">娓呯┖</button>
-<button onclick="copyLog()">澶嶅埗</button>
-<button onclick="toggleLogPanel()">鉁?/button>
-</div>
+<span class="log-title">📋 运行日志</span><span class="log-count" id="log-count">(0)</span>
+<div class="log-actions"><button onclick="clearLog()">清空</button><button onclick="copyLog()">复制</button><button onclick="toggleLogPanel()">✕</button></div>
 </div>
 <div id="log-body"></div>
 </div>
 
 <script>
 // === DATA ===
-const DB={ideas:[],scripts:[],prompts:[],
-save(){localStorage.setItem('workflow_data',JSON.stringify({ideas:this.ideas,scripts:this.scripts,prompts:this.prompts}))},
-load(){const d=localStorage.getItem('workflow_data');if(d){const p=JSON.parse(d);this.ideas=p.ideas||[];this.scripts=p.scripts||[];this.prompts=p.prompts||[]}}};
+var DB={ideas:[],scripts:[],prompts:[],
+save:function(){localStorage.setItem('workflow_data',JSON.stringify({ideas:this.ideas,scripts:this.scripts,prompts:this.prompts}))},
+load:function(){var d=localStorage.getItem('workflow_data');if(d){var p=JSON.parse(d);this.ideas=p.ideas||[];this.scripts=p.scripts||[];this.prompts=p.prompts||[]}}};
 
 function $(id){return document.getElementById(id)}
 
 // === CONFIG ===
 function getCfg(){
-const model=$('cfg-model').value;
-const dMin=parseInt($('cfg-duration-min').value)||30;
-const dMax=parseInt($('cfg-duration-max').value)||60;
-const shotDurMax=parseInt($('cfg-shot-dur').value)||5;
-const duration=dMin===dMax?dMin:Math.floor(Math.random()*(dMax-dMin+1))+dMin;
+var model=$('cfg-model').value;
+var dMin=parseInt($('cfg-duration-min').value)||30;
+var dMax=parseInt($('cfg-duration-max').value)||60;
+var shotDurMax=parseInt($('cfg-shot-dur').value)||5;
+var duration=dMin===dMax?dMin:Math.floor(Math.random()*(dMax-dMin+1))+dMin;
 return{baseUrl:$('cfg-base-url').value.trim().replace(/\/$/,''),
 apiKey:$('cfg-api-key').value.trim(),
 model:model==='custom'?$('cfg-model-custom').value.trim():model,
 batch:parseInt($('cfg-batch').value)||5,
 background:$('cfg-background').value.trim(),
 reference:$('cfg-reference').value.trim(),
-durationMin:dMin,durationMax:dMax,duration,shotDurMax,
+durationMin:dMin,durationMax:dMax,duration:duration,shotDurMax:shotDurMax,
 ratio:$('cfg-ratio').value,
 visualStyle:$('cfg-visual-style').value.trim()}}
 
@@ -431,32 +382,32 @@ $('custom-model-group').style.display=this.value==='custom'?'flex':'none'});
 
 // === TAB ===
 function switchTab(name){
-document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active')});
+document.querySelectorAll('.tab-item').forEach(function(t){t.classList.remove('active')});
 $('panel-'+name).classList.add('active');$('tab-'+name).classList.add('active')}
 
 function openDrawer(){$('drawer-overlay').classList.add('open')}
 function closeDrawer(){$('drawer-overlay').classList.remove('open')}
 
 // === LOG ===
-const LOG={entries:[],errorCount:0};
+var LOG={entries:[],errorCount:0};
 function addLog(level,msg,detail){
-const now=new Date();const ts=now.toTimeString().slice(0,8)+'.'+String(now.getMilliseconds()).padStart(3,'0');
-LOG.entries.push({ts,level,msg,detail:detail||''});if(level==='err')LOG.errorCount++;
-const body=$('log-body');const div=document.createElement('div');div.className='log-entry';
+var now=new Date();var ts=now.toTimeString().slice(0,8)+'.'+String(now.getMilliseconds()).padStart(3,'0');
+LOG.entries.push({ts:ts,level:level,msg:msg,detail:detail||''});if(level==='err')LOG.errorCount++;
+var body=$('log-body');var div=document.createElement('div');div.className='log-entry';
 div.innerHTML='<span class="log-time">'+ts+'</span><span class="log-tag '+level+'">'+level+'</span><span class="log-msg">'+escHtml(msg)+(detail?'<div class="log-detail">'+escHtml(String(detail).slice(0,2000))+'</div>':'')+'</span>';
 body.appendChild(div);body.scrollTop=body.scrollHeight;$('log-count').textContent='('+LOG.entries.length+')';
-if(level==='err'){const panel=$('log-panel');if(!panel.classList.contains('open'))panel.classList.add('open');updateLogBadge()}}
-function updateLogBadge(){const btn=$('log-toggle');let b=btn.querySelector('.log-badge');
+if(level==='err'){var panel=$('log-panel');if(!panel.classList.contains('open'))panel.classList.add('open');updateLogBadge()}}
+function updateLogBadge(){var btn=$('log-toggle');var b=btn.querySelector('.log-badge');
 if(LOG.errorCount>0){if(!b){b=document.createElement('span');b.className='log-badge';btn.appendChild(b)}b.textContent=LOG.errorCount}else if(b)b.remove()}
-function toggleLogPanel(){const p=$('log-panel');p.classList.toggle('open');if(p.classList.contains('open')){LOG.errorCount=0;updateLogBadge()}}
+function toggleLogPanel(){var p=$('log-panel');p.classList.toggle('open');if(p.classList.contains('open')){LOG.errorCount=0;updateLogBadge()}}
 function clearLog(){LOG.entries=[];LOG.errorCount=0;$('log-body').innerHTML='';$('log-count').textContent='(0)';updateLogBadge()}
-function copyLog(){const t=LOG.entries.map(function(e){return '['+e.ts+'] ['+e.level.toUpperCase()+'] '+e.msg+(e.detail?'\n  '+e.detail:'')}).join('\n');navigator.clipboard.writeText(t||'(empty)').then(function(){toast('鏃ュ織宸插鍒?,'success')})}
+function copyLog(){var t=LOG.entries.map(function(e){return '['+e.ts+'] ['+e.level.toUpperCase()+'] '+e.msg+(e.detail?'\n  '+e.detail:'')}).join('\n');navigator.clipboard.writeText(t||'(空)').then(function(){toast('日志已复制','success')})}
 
 // === UTILS ===
 function escHtml(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function toast(msg,type){type=type||'info';var c=$('toast-container');var el=document.createElement('div');el.className='toast '+type;el.textContent=msg;c.appendChild(el);setTimeout(function(){el.remove()},3500)}
-function setBtnLoading(btn,loading){if(loading){btn.dataset.origText=btn.innerHTML;btn.innerHTML='<span class="spinner"></span> 鐢熸垚涓?..';btn.disabled=true}else{btn.innerHTML=btn.dataset.origText||btn.innerHTML;btn.disabled=false}}
+function setBtnLoading(btn,loading){if(loading){btn.dataset.origText=btn.innerHTML;btn.innerHTML='<span class="spinner"></span> 生成中...';btn.disabled=true}else{btn.innerHTML=btn.dataset.origText||btn.innerHTML;btn.disabled=false}}
 function setProgress(id,pct){$(id).style.width=pct+'%'}
 function closeModal(id){$(id).classList.remove('open')}
 
@@ -474,75 +425,64 @@ JSON.parse(raw)}
 // === AI CALL ===
 async function callAI(messages){
 var cfg=getCfg();
-if(!cfg.apiKey){addLog('err','API Key 鏈～鍐?);toast('璇峰厛濉啓 API Key','error');throw new Error('no key')}
+if(!cfg.apiKey){addLog('err','API Key 未填写');toast('请先填写 API Key','error');throw new Error('no key')}
 var reqBody={model:cfg.model,messages:messages,temperature:0.9};
-addLog('info','鈫?璇锋眰 '+cfg.model,'URL: '+cfg.baseUrl+'/chat/completions');
+addLog('info','→ 请求 '+cfg.model,'URL: '+cfg.baseUrl+'/chat/completions');
 var t0=performance.now();var res;
 try{res=await fetch(cfg.baseUrl+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+cfg.apiKey},body:JSON.stringify(reqBody)})}
-catch(netErr){var el1=((performance.now()-t0)/1000).toFixed(1);addLog('err','缃戠粶閿欒 ('+el1+'s)',netErr.message);throw netErr}
+catch(netErr){var el1=((performance.now()-t0)/1000).toFixed(1);addLog('err','网络错误 ('+el1+'s)',netErr.message);throw netErr}
 var elapsed=((performance.now()-t0)/1000).toFixed(1);
-if(!res.ok){var err=await res.text();addLog('err','API 閿欒 '+res.status+' ('+elapsed+'s)',err.slice(0,2000));throw new Error('API Error '+res.status+': '+err)}
-addLog('ok','鈫?鍝嶅簲 '+res.status+' ('+elapsed+'s)');
+if(!res.ok){var err=await res.text();addLog('err','API 错误 '+res.status+' ('+elapsed+'s)',err.slice(0,2000));throw new Error('API Error '+res.status+': '+err)}
+addLog('ok','← 响应 '+res.status+' ('+elapsed+'s)');
 var json=await res.json();var content=json.choices[0].message.content;
-addLog('ok','鈫?瀹屾垚 ('+content.length+' chars)');return content}
+addLog('ok','← 完成 ('+content.length+' chars)');return content}
 
 // === BRAINSTORM ===
 async function runBrainstorm(){
 var cfg=getCfg();var btn=$('btn-brainstorm');
-if(!cfg.apiKey){toast('璇峰厛閰嶇疆 API Key锛堢偣鍑诲彸涓婅 鈿欙笍锛?,'error');return}
-setBtnLoading(btn,true);setProgress('ideas-progress',10);toast('馃 姝ｅ湪鐢熸垚鍒涙剰...','success');
+if(!cfg.apiKey){toast('请先配置 API Key（点击右上角 ⚙️）','error');return}
+setBtnLoading(btn,true);setProgress('ideas-progress',10);toast('🧠 正在生成创意...','success');
 var pref=currentPreference;var prefText='';
 if(pref){var r=pref.preference||pref.report;if(r){
-prefText='\n\n銆愮敤鎴峰亸濂藉垎鏋愩€慭n';
-if(r.themes&&r.themes.preferred&&r.themes.preferred.length)prefText+='- 鍋忓ソ涓婚锛?+r.themes.preferred.join('銆?)+'\n';
-if(r.themes&&r.themes.avoided&&r.themes.avoided.length)prefText+='- 閬垮厤涓婚锛?+r.themes.avoided.join('銆?)+'\n';
-if(r.preferredThemes&&r.preferredThemes.length)prefText+='- 鍋忓ソ涓婚锛?+r.preferredThemes.join('銆?)+'\n';
-if(r.avoidedThemes&&r.avoidedThemes.length)prefText+='- 閬垮厤涓婚锛?+r.avoidedThemes.join('銆?)+'\n';
-if(r.style&&r.style.visual)prefText+='- 鐢婚鍊惧悜锛?+r.style.visual+'\n';
-if(r.visualStyle)prefText+='- 鐢婚鍊惧悜锛?+r.visualStyle+'\n';
-if(r.style&&r.style.narrative)prefText+='- 鍙欎簨椋庢牸锛?+r.style.narrative+'\n';
-if(r.narrativeStyle)prefText+='- 鍙欎簨椋庢牸锛?+r.narrativeStyle+'\n';
-if(r.elements&&r.elements.length)prefText+='- 鍏抽敭鍏冪礌锛?+r.elements.join('銆?)+'\n';
-if(r.keyElements&&r.keyElements.length)prefText+='- 鍏抽敭鍏冪礌锛?+r.keyElements.join('銆?)+'\n';
-if(r.coreConcepts&&r.coreConcepts.length)prefText+='- 鏍稿績姒傚康锛?+r.coreConcepts.join('銆?)+'\n';
-prefText+='\n璇蜂弗鏍兼寜鐓т笂杩板亸濂界敓鎴愬垱鎰忥紝閬垮厤韪╁潙銆俓n'}}
-var prompt='浣犳槸涓€浣嶆瀬鍏峰垱鎰忕殑鐭棰戞晠浜嬬瓥鍒掑笀銆俓n璇峰熀浜庝互涓嬩俊鎭紝鎵归噺鐢熸垚 '+cfg.batch+' 涓樊寮傚寲鐨勫皬鏁呬簨鍒涙剰锛岀敤浜庡埗浣?'+cfg.durationMin+'~'+cfg.durationMax+' 绉掑乏鍙崇殑鐭棰戙€俓n\n銆愬熀纭€鏁呬簨鑳屾櫙銆慭n'+(cfg.background||'锛堟湭鎸囧畾锛岃鑷敱鍙戞尌锛?)+'\n\n銆愮珵鍝佸弬鑰冮鏍笺€慭n'+(cfg.reference||'锛堟湭鎸囧畾锛岃鑷敱鍙戞尌锛?)+prefText+'\n\n瑕佹眰锛歕n- 姣忎釜鍒涙剰蹇呴』鍦ㄨ儗鏅鏋跺唴锛屼絾瑙掑害鍜屽垏鍏ョ偣瑕佹湁鏄庢樉宸紓\n- 濡傛湁绔炲搧鍙傝€冿紝闇€鎻愮偧鍏跺惛寮曚汉鐨勭粨鏋?鎯呯华锛屽苟鍦ㄦ鍩虹涓婂垱鏂癨n- 姣忎釜鏁呬簨瑕佹湁娓呮櫚鐨勬儏鎰熼挬瀛愶紝閫傚悎鐭棰戜紶鎾璡n\n姣忎釜鍒涙剰蹇呴』鍖呭惈锛歕n- 鏍囬锛堢畝娲佸惛寮曚汉锛屸墹15瀛楋級\n- 涓€鍙ヨ瘽鏍稿績姒傚康锛堚墹30瀛楋級\n- 鏁呬簨绠€杩帮紙3-5鍙ヨ瘽锛屾弿杩板紑澶淬€侀珮娼€佺粨灞€锛塡n- 鎯呯华鏍囩锛?-3涓瘝锛屽锛氭俯鎯呫€佹偓鐤戙€佸姳蹇楋級\n- 瑙嗚浜偣锛堟渶閫傚悎鎷嶆憚鐨?-2涓敾闈㈡弿杩帮級\n- 鍒涙剰璇勫垎锛?-10鍒嗭紝鍩轰簬鏁呬簨鍒涙柊搴﹀拰瑙嗚琛ㄧ幇鍔涳級\n\n涓ユ牸鎸夌収浠ヤ笅 JSON 鏍煎紡杈撳嚭锛屼笉瑕佸叾浠栨枃瀛椼€傛墍鏈夊瓧绗︿覆鍊煎繀椤荤敤鍙屽紩鍙峰寘瑁癸細\n[\n  {"title":"...","concept":"...","story":"...","tags":["..."],"visual":"...","score":8}\n]';
+prefText='\n\n【用户偏好分析】\n';
+if(r.themes&&r.themes.preferred&&r.themes.preferred.length)prefText+='- 偏好主题：'+r.themes.preferred.join('、')+'\n';
+if(r.themes&&r.themes.avoided&&r.themes.avoided.length)prefText+='- 避免主题：'+r.themes.avoided.join('、')+'\n';
+if(r.preferredThemes&&r.preferredThemes.length)prefText+='- 偏好主题：'+r.preferredThemes.join('、')+'\n';
+if(r.avoidedThemes&&r.avoidedThemes.length)prefText+='- 避免主题：'+r.avoidedThemes.join('、')+'\n';
+if(r.style&&r.style.visual)prefText+='- 画风倾向：'+r.style.visual+'\n';
+if(r.visualStyle)prefText+='- 画风倾向：'+r.visualStyle+'\n';
+if(r.style&&r.style.narrative)prefText+='- 叙事风格：'+r.style.narrative+'\n';
+if(r.narrativeStyle)prefText+='- 叙事风格：'+r.narrativeStyle+'\n';
+if(r.elements&&r.elements.length)prefText+='- 关键元素：'+r.elements.join('、')+'\n';
+if(r.keyElements&&r.keyElements.length)prefText+='- 关键元素：'+r.keyElements.join('、')+'\n';
+if(r.coreConcepts&&r.coreConcepts.length)prefText+='- 核心概念：'+r.coreConcepts.join('、')+'\n';
+prefText+='\n请严格按照上述偏好生成创意，避免踩坑。\n'}}
+var prompt='你是一位极具创意的短视频故事策划师。\n请基于以下信息，批量生成 '+cfg.batch+' 个差异化的小故事创意，用于制作 '+cfg.durationMin+'~'+cfg.durationMax+' 秒左右的短视频。\n\n【基础故事背景】\n'+(cfg.background||'（未指定，请自由发挥）')+'\n\n【竞品参考风格】\n'+(cfg.reference||'（未指定，请自由发挥）')+prefText+'\n\n要求：\n- 每个创意必须在背景框架内，但角度和切入点要有明显差异\n- 如有竞品参考，需提炼其吸引人的结构/情绪，并在此基础上创新\n- 每个故事要有清晰的情感钩子，适合短视频传播\n\n每个创意必须包含：\n- 标题（简洁吸引人，≤15字）\n- 一句话核心概念（≤30字）\n- 故事简述（3-5句话，描述开头、高潮、结局）\n- 情绪标签（1-3个词，如：温情、悬疑、励志）\n- 视觉亮点（最适合拍摄的1-2个画面描述）\n- 创意评分（1-10分，基于故事创新度和视觉表现力）\n\n严格按照以下 JSON 格式输出，不要其他文字。所有字符串值必须用双引号包裹：\n[{"title":"...","concept":"...","story":"...","tags":["..."],"visual":"...","score":8}]';
 try{
 var container=$('ideas-list');if(container.querySelector('.empty-state'))container.innerHTML='';
 setProgress('ideas-progress',30);
-var raw;try{raw=await callAI([{role:'user',content:prompt}])}catch(apiErr){throw new Error('API 璋冪敤澶辫触锛?+apiErr.message)}
+var raw;try{raw=await callAI([{role:'user',content:prompt}])}catch(apiErr){throw new Error('API 调用失败：'+apiErr.message)}
 setProgress('ideas-progress',80);
-var match=raw.match(/\[[\s\S]*\]/);
-if(!match){addLog('err','澶磋剳椋庢毚锛氭湭鑳芥彁鍙?JSON',raw.slice(0,1000));throw new Error('AI 杩斿洖鏍煎紡閿欒')}
-var ideas;try{ideas=tryParseJSON(match[0])}catch(pe){addLog('err','JSON 瑙ｆ瀽澶辫触',pe.message);throw pe}
-if(!Array.isArray(ideas)||ideas.length===0)throw new Error('AI 鏈繑鍥炴湁鏁堝垱鎰?);
+var match=raw.match(/\[[\s\S]*\]/);if(!match){addLog('err','头脑风暴：未能提取 JSON',raw.slice(0,1000));throw new Error('AI 返回格式错误')}
+var ideas;try{ideas=tryParseJSON(match[0])}catch(pe){addLog('err','JSON 解析失败',pe.message);throw pe}
+if(!Array.isArray(ideas)||ideas.length===0)throw new Error('AI 未返回有效创意');
 ideas.forEach(function(idea){idea.id='idea_'+Date.now()+'_'+Math.random().toString(36).slice(2);idea.status='pending';DB.ideas.push(idea)});
 DB.save();renderIdeas();setProgress('ideas-progress',100);
-addLog('ok','澶磋剳椋庢毚瀹屾垚锛氱敓鎴?'+ideas.length+' 涓垱鎰?);toast('鉁?鐢熸垚浜?'+ideas.length+' 涓垱鎰忥紒','success');
-}catch(e){addLog('err','澶磋剳椋庢毚澶辫触',e.message);toast('鐢熸垚澶辫触锛?+e.message,'error');setProgress('ideas-progress',0)}
+addLog('ok','头脑风暴完成：生成 '+ideas.length+' 个创意');toast('✨ 生成了 '+ideas.length+' 个创意！','success');
+}catch(e){addLog('err','头脑风暴失败',e.message);toast('生成失败：'+e.message,'error');setProgress('ideas-progress',0)}
 finally{setBtnLoading(btn,false);setTimeout(function(){setProgress('ideas-progress',0)},1500)}}
 
 function renderIdeas(){
 var list=$('ideas-list');list.innerHTML='';
-if(DB.ideas.length===0){list.innerHTML='<div class="empty-state"><div class="es-icon">馃挱</div><p>鐐瑰嚮涓嬫柟鎸夐挳锛岃 AI 鎵归噺鐢熸垚鏁呬簨鍒涙剰</p></div>';updateCounts();return}
+if(DB.ideas.length===0){list.innerHTML='<div class="empty-state"><div class="es-icon">💭</div><p>点击下方按钮，让 AI 批量生成故事创意</p></div>';updateCounts();return}
 DB.ideas.forEach(function(idea,i){
 var div=document.createElement('div');
 div.className='idea-card'+(idea.status==='approved'?' approved':idea.status==='rejected'?' rejected':'');
 div.id='idea-'+idea.id;
 var tagsHtml=(idea.tags||[]).map(function(t){return '<span class="tag">'+escHtml(t)+'</span>'}).join('');
-if(idea.status==='approved')tagsHtml+='<span class="tag" style="background:rgba(76,202,116,.12);color:var(--green)">鉁?宸叉壒鍑?/span>';
-if(idea.status==='rejected')tagsHtml+='<span class="tag" style="background:rgba(240,85,85,.12);color:var(--red)">鉁?宸叉嫆缁?/span>';
-div.innerHTML='<div class="ic-top"><span class="ic-num">#'+(i+1)+'</span><span class="ic-title">'+escHtml(idea.title)+'</span><span class="score-badge">猸?'+idea.score+'</span></div>'
-+'<div class="ic-body">'+escHtml(idea.concept)+'</div>'
-+'<div class="ic-body" style="color:#8899bb">'+escHtml(idea.story)+'</div>'
-+'<div class="ic-tags">'+tagsHtml+'</div>'
-+'<div class="ic-body" style="font-size:12px;color:#6688aa">馃帴 '+escHtml(idea.visual)+'</div>'
-+'<div class="ic-actions">'
-+'<button class="btn btn-success btn-sm" onclick="approveIdea(\''+idea.id+'\')">鉁?鎵瑰噯</button>'
-+'<button class="btn btn-danger btn-sm" onclick="rejectIdea(\''+idea.id+'\')">鉁?鎷掔粷</button>'
-+'<button class="btn btn-ghost btn-sm" onclick="editIdea(\''+idea.id+'\')">鉁忥笍</button>'
-+'<button class="btn btn-ghost btn-sm" onclick="deleteIdea(\''+idea.id+'\')">馃棏锔?/button>'
-+'</div>';
+if(idea.status==='approved')tagsHtml+='<span class="tag" style="background:rgba(76,202,116,.12);color:var(--green)">✓ 已批准</span>';
+if(idea.status==='rejected')tagsHtml+='<span class="tag" style="background:rgba(240,85,85,.12);color:var(--red)">✗ 已拒绝</span>';
+div.innerHTML='<div class="ic-top"><span class="ic-num">#'+(i+1)+'</span><span class="ic-title">'+escHtml(idea.title)+'</span><span class="score-badge">⭐ '+idea.score+'</span></div><div class="ic-body">'+escHtml(idea.concept)+'</div><div class="ic-body" style="color:#8899bb">'+escHtml(idea.story)+'</div><div class="ic-tags">'+tagsHtml+'</div><div class="ic-body" style="font-size:12px;color:#6688aa">🎥 '+escHtml(idea.visual)+'</div><div class="ic-actions"><button class="btn btn-success btn-sm" onclick="approveIdea(\''+idea.id+'\')">✓ 批准</button><button class="btn btn-danger btn-sm" onclick="rejectIdea(\''+idea.id+'\')">✗ 拒绝</button><button class="btn btn-ghost btn-sm" onclick="editIdea(\''+idea.id+'\')">✏️</button><button class="btn btn-ghost btn-sm" onclick="deleteIdea(\''+idea.id+'\')">🗑️</button></div>';
 list.appendChild(div)});
 updateCounts();updateApprovedSelect()}
 
@@ -551,157 +491,93 @@ function rejectIdea(id){var i=DB.ideas.find(function(x){return x.id===id});if(i)
 function deleteIdea(id){DB.ideas=DB.ideas.filter(function(x){return x.id!==id});DB.save();renderIdeas()}
 function approveAll(){DB.ideas.forEach(function(i){if(i.status!=='rejected')i.status='approved'});DB.save();renderIdeas()}
 function rejectAll(){DB.ideas=DB.ideas.filter(function(i){return i.status!=='rejected'});DB.save();renderIdeas()}
-function clearIdeas(){if(!confirm('纭畾娓呯┖鎵€鏈夊垱鎰忥紵'))return;DB.ideas=[];DB.save();renderIdeas()}
+function clearIdeas(){if(!confirm('确定清空所有创意？'))return;DB.ideas=[];DB.save();renderIdeas()}
 
 function editIdea(id){
 var idea=DB.ideas.find(function(x){return x.id===id});if(!idea)return;
-$('edit-modal-title').textContent='缂栬緫鍒涙剰';
-$('edit-modal-body').innerHTML='<div class="form-group"><label>鏍囬</label><input id="ei-title" value="'+escHtml(idea.title)+'"/></div>'
-+'<div class="form-group"><label>鏍稿績姒傚康</label><input id="ei-concept" value="'+escHtml(idea.concept)+'"/></div>'
-+'<div class="form-group"><label>鏁呬簨绠€杩?/label><textarea id="ei-story" rows="4">'+escHtml(idea.story)+'</textarea></div>'
-+'<div class="form-group"><label>鎯呯华鏍囩锛堥€楀彿鍒嗛殧锛?/label><input id="ei-tags" value="'+idea.tags.join('銆?)+'"/></div>'
-+'<div class="form-group"><label>瑙嗚浜偣</label><textarea id="ei-visual" rows="2">'+escHtml(idea.visual)+'</textarea></div>'
-+'<div class="form-group"><label>璇勫垎锛?-10锛?/label><input type="number" id="ei-score" value="'+idea.score+'" min="1" max="10"/></div>';
-$('edit-save-btn').onclick=function(){
-idea.title=$('ei-title').value;idea.concept=$('ei-concept').value;idea.story=$('ei-story').value;
-idea.tags=$('ei-tags').value.split(/[,锛屻€乚/).map(function(t){return t.trim()}).filter(Boolean);
-idea.visual=$('ei-visual').value;idea.score=parseInt($('ei-score').value)||idea.score;
-DB.save();renderIdeas();closeModal('edit-modal');toast('鍒涙剰宸蹭繚瀛?,'success')};
+$('edit-modal-title').textContent='编辑创意';
+$('edit-modal-body').innerHTML='<div class="form-group"><label>标题</label><input id="ei-title" value="'+escHtml(idea.title)+'"/></div><div class="form-group"><label>核心概念</label><input id="ei-concept" value="'+escHtml(idea.concept)+'"/></div><div class="form-group"><label>故事简述</label><textarea id="ei-story" rows="4">'+escHtml(idea.story)+'</textarea></div><div class="form-group"><label>情绪标签（逗号分隔）</label><input id="ei-tags" value="'+idea.tags.join('、')+'"/></div><div class="form-group"><label>视觉亮点</label><textarea id="ei-visual" rows="2">'+escHtml(idea.visual)+'</textarea></div><div class="form-group"><label>评分（1-10）</label><input type="number" id="ei-score" value="'+idea.score+'" min="1" max="10"/></div>';
+$('edit-save-btn').onclick=function(){idea.title=$('ei-title').value;idea.concept=$('ei-concept').value;idea.story=$('ei-story').value;idea.tags=$('ei-tags').value.split(/[,，、]/).map(function(t){return t.trim()}).filter(Boolean);idea.visual=$('ei-visual').value;idea.score=parseInt($('ei-score').value)||idea.score;DB.save();renderIdeas();closeModal('edit-modal');toast('创意已保存','success')};
 $('edit-modal').classList.add('open')}
 
-function updateApprovedSelect(){
-var sel=$('select-approved-idea');var cur=sel.value;
-sel.innerHTML='<option value="">鈥?閫夋嫨宸叉壒鍑嗙殑鍒涙剰 鈥?/option>';
-DB.ideas.filter(function(i){return i.status==='approved'}).forEach(function(idea){
-var opt=document.createElement('option');opt.value=idea.id;opt.textContent=idea.title+' (猸?+idea.score+')';sel.appendChild(opt)});
-if(cur)sel.value=cur}
+function updateApprovedSelect(){var sel=$('select-approved-idea');var cur=sel.value;sel.innerHTML='<option value="">— 选择已批准的创意 —</option>';DB.ideas.filter(function(i){return i.status==='approved'}).forEach(function(idea){var opt=document.createElement('option');opt.value=idea.id;opt.textContent=idea.title+' (⭐'+idea.score+')';sel.appendChild(opt)});if(cur)sel.value=cur}
 
 // === PREFERENCE ===
 var currentPreference=null;
 function loadPreferenceFromStorage(){try{var s=localStorage.getItem('preference_skill');if(s){currentPreference=JSON.parse(s);return true}}catch(e){}return false}
-function loadSkillFile(event){
-var file=event.target.files[0];if(!file)return;
-var reader=new FileReader();reader.onload=function(e){
-try{var data=JSON.parse(e.target.result);if(data.preference||data.report){currentPreference=data;localStorage.setItem('preference_skill',JSON.stringify(data));displayPreference(data);toast('鍋忓ソ鏂囦欢鍔犺浇鎴愬姛锛?,'success')}else{toast('鏂囦欢鏍煎紡涓嶆纭?,'error')}}
-catch(err){toast('鏂囦欢瑙ｆ瀽澶辫触锛?+err.message,'error')}};
-reader.readAsText(file);event.target.value=''}
-
-function displayPreference(data){
-var content=$('preference-content');var empty=$('preference-empty');
-if(!data){content.style.display='none';empty.style.display='block';return}
-var r=data.preference||data.report;if(!r){content.style.display='none';empty.style.display='block';return}
-var h='<div style="margin-bottom:6px"><span style="color:var(--muted)">鏉ユ簮锛?/span>'+(data.name||'鍋忓ソ鍒嗘瀽')+'</div>';
-if(r.themes&&r.themes.preferred&&r.themes.preferred.length)h+='<div style="margin-bottom:4px"><span style="color:var(--green)">鉁?鍋忓ソ锛?/span>'+r.themes.preferred.join('銆?)+'</div>';
-if(r.themes&&r.themes.avoided&&r.themes.avoided.length)h+='<div style="margin-bottom:4px"><span style="color:var(--red)">鉂?閬垮厤锛?/span>'+r.themes.avoided.join('銆?)+'</div>';
-if(r.preferredThemes&&r.preferredThemes.length)h+='<div style="margin-bottom:4px"><span style="color:var(--green)">鉁?鍋忓ソ锛?/span>'+r.preferredThemes.join('銆?)+'</div>';
-if(r.avoidedThemes&&r.avoidedThemes.length)h+='<div style="margin-bottom:4px"><span style="color:var(--red)">鉂?閬垮厤锛?/span>'+r.avoidedThemes.join('銆?)+'</div>';
-h+='<div style="margin-top:8px"><button class="btn btn-ghost btn-sm" onclick="clearPreference()">馃棏锔?娓呴櫎鍋忓ソ</button></div>';
-content.innerHTML=h;content.style.display='block';empty.style.display='none'}
-function clearPreference(){currentPreference=null;localStorage.removeItem('preference_skill');displayPreference(null);toast('鍋忓ソ宸叉竻闄?,'success')}
-
+function loadSkillFile(event){var file=event.target.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var data=JSON.parse(e.target.result);if(data.preference||data.report){currentPreference=data;localStorage.setItem('preference_skill',JSON.stringify(data));displayPreference(data);toast('偏好文件加载成功！','success')}else{toast('文件格式不正确','error')}}catch(err){toast('文件解析失败：'+err.message,'error')}};reader.readAsText(file);event.target.value=''}
+function displayPreference(data){var content=$('preference-content');var empty=$('preference-empty');if(!data){content.style.display='none';empty.style.display='block';return}var r=data.preference||data.report;if(!r){content.style.display='none';empty.style.display='block';return}var h='<div style="margin-bottom:6px"><span style="color:var(--muted)">来源：</span>'+(data.name||'偏好分析')+'</div>';if(r.themes&&r.themes.preferred&&r.themes.preferred.length)h+='<div style="margin-bottom:4px"><span style="color:var(--green)">✅ 偏好：</span>'+r.themes.preferred.join('、')+'</div>';if(r.themes&&r.themes.avoided&&r.themes.avoided.length)h+='<div style="margin-bottom:4px"><span style="color:var(--red)">❌ 避免：</span>'+r.themes.avoided.join('、')+'</div>';h+='<div style="margin-top:8px"><button class="btn btn-ghost btn-sm" onclick="clearPreference()">🗑️ 清除偏好</button></div>';content.innerHTML=h;content.style.display='block';empty.style.display='none'}
+function clearPreference(){currentPreference=null;localStorage.removeItem('preference_skill');displayPreference(null);toast('偏好已清除','success')}
 
 // === SCRIPT CREATION ===
 async function runScriptCreation(){
 var cfg=getCfg();var ideaId=$('select-approved-idea').value;
-if(!ideaId){toast('璇峰厛閫夋嫨涓€涓凡鎵瑰噯鐨勫垱鎰?,'error');return}
+if(!ideaId){toast('请先选择一个已批准的创意','error');return}
 var idea=DB.ideas.find(function(x){return x.id===ideaId});if(!idea)return;
 var btn=$('btn-script');setBtnLoading(btn,true);setProgress('scripts-progress',10);
 var shotCount=Math.floor(cfg.duration/Math.ceil(cfg.shotDurMax/2));
-var prompt='浣犳槸涓€浣嶄笓涓氱殑鐭棰戝墽鏈婕斻€俓n鏍规嵁浠ヤ笅鏁呬簨鍒涙剰锛屽垱浣滀竴涓畬鏁寸殑鐭棰戝墽鏈紝骞跺垎瑙ｄ负鍏蜂綋鍒嗛暅鑴氭湰銆俓n\n銆愬垱鎰忎俊鎭€慭n鏍囬锛?+idea.title+'\n鏍稿績姒傚康锛?+idea.concept+'\n鏁呬簨锛?+idea.story+'\n瑙嗚浜偣锛?+idea.visual+'\n\n銆愬埗浣滆姹傘€慭n- 鎬绘椂闀匡細'+cfg.durationMin+' ~ '+cfg.durationMax+' 绉抃n- 鍒嗛暅鏁伴噺锛氱害 '+shotCount+' 涓暅澶碶n- 姣忎釜鍒嗛暅鏃堕暱锛? ~ '+cfg.shotDurMax+' 绉掍箣闂寸殑鏁存暟\n- 鐢婚潰姣斾緥锛?+cfg.ratio+'\n- 鏁翠綋鎯呮劅鑺傚锛氬紑澶村缓绔嬫儏鎰熲啋涓鎺ㄨ繘鈫掔粨灏惧崌鍗?鍙嶈浆\n\n璇锋寜浠ヤ笅 JSON 鏍煎紡杈撳嚭锛歕n{"title":"'+idea.title+'","logline":"涓€鍙ヨ瘽鏁呬簨姊楁","theme":"鏍稿績涓婚","duration":瀹為檯鎬绘椂闀?"act1":"绗竴骞曠畝杩?,"act2":"绗簩骞曠畝杩?,"act3":"绗笁骞曠畝杩?,"shots":[{"shotNum":1,"duration":5,"type":"闀滃ご绫诲瀷","action":"鐢婚潰鍔ㄤ綔鎻忚堪","location":"鍦烘櫙鍦扮偣","mood":"鎯呯华姘涘洿","narration":"鏃佺櫧鎴栧璇?,"visualNote":"瑙嗚鍒涙剰澶囨敞"}]}\n\n鍙緭鍑?JSON锛屼笉瑕佸叾浠栨枃瀛椼€?;
+var prompt='你是一位专业的短视频剧本导演。\n根据以下故事创意，创作一个完整的短视频剧本，并分解为具体分镜脚本。\n\n【创意信息】\n标题：'+idea.title+'\n核心概念：'+idea.concept+'\n故事：'+idea.story+'\n视觉亮点：'+idea.visual+'\n\n【制作要求】\n- 总时长：'+cfg.durationMin+' ~ '+cfg.durationMax+' 秒\n- 分镜数量：约 '+shotCount+' 个镜头\n- 每个分镜时长：1 ~ '+cfg.shotDurMax+' 秒之间的整数\n- 画面比例：'+cfg.ratio+'\n\n请按以下 JSON 格式输出：\n{"title":"...","logline":"一句话梗概","theme":"核心主题","duration":40,"act1":"第一幕","act2":"第二幕","act3":"第三幕","shots":[{"shotNum":1,"duration":5,"type":"镜头类型","action":"画面动作","location":"场景","mood":"情绪","narration":"旁白","visualNote":"备注"}]}\n\n只输出 JSON。';
 try{setProgress('scripts-progress',30);
 var raw=await callAI([{role:'user',content:prompt}]);setProgress('scripts-progress',80);
-var match=raw.match(/\{[\s\S]*\}/);if(!match){addLog('err','鍓ф湰锛氳繑鍥炴牸寮忛敊璇?,raw.slice(0,1000));throw new Error('杩斿洖鏍煎紡閿欒')}
-var script;try{script=tryParseJSON(match[0])}catch(pe){addLog('err','鍓ф湰 JSON 瑙ｆ瀽澶辫触',pe.message);throw pe}
+var match=raw.match(/\{[\s\S]*\}/);if(!match){addLog('err','剧本：返回格式错误',raw.slice(0,1000));throw new Error('返回格式错误')}
+var script;try{script=tryParseJSON(match[0])}catch(pe){addLog('err','剧本 JSON 解析失败',pe.message);throw pe}
 script.id='script_'+Date.now();script.ideaId=ideaId;script.createdAt=new Date().toLocaleString();
 DB.scripts.push(script);DB.save();renderScripts();setProgress('scripts-progress',100);
-addLog('ok','鍓ф湰瀹屾垚锛?+script.title+' '+script.shots.length+' 涓垎闀?);
-toast('馃幀 鍓ф湰瀹屾垚锛佸叡 '+script.shots.length+' 涓垎闀?,'success');
-}catch(e){addLog('err','鍓ф湰鍒涗綔澶辫触',e.message);toast('鐢熸垚澶辫触锛?+e.message,'error');setProgress('scripts-progress',0)}
+addLog('ok','剧本完成：'+script.title+' '+(script.shots||[]).length+' 个分镜');
+toast('🎬 剧本完成！共 '+(script.shots||[]).length+' 个分镜','success');
+}catch(e){addLog('err','剧本创作失败',e.message);toast('生成失败：'+e.message,'error');setProgress('scripts-progress',0)}
 finally{setBtnLoading(btn,false);setTimeout(function(){setProgress('scripts-progress',0)},1500)}}
 
 function renderScripts(){
 var list=$('scripts-list');list.innerHTML='';
-if(DB.scripts.length===0){list.innerHTML='<div class="empty-state"><div class="es-icon">馃摐</div><p>浠庡垱鎰忛潰鏉挎壒鍑嗗垱鎰忓悗锛岄€夋嫨鍒涙剰鐢熸垚鍓ф湰</p></div>';updateCounts();return}
+if(DB.scripts.length===0){list.innerHTML='<div class="empty-state"><div class="es-icon">📜</div><p>从创意面板批准创意后，选择创意生成剧本</p></div>';updateCounts();return}
 DB.scripts.forEach(function(script){
 var div=document.createElement('div');div.className='script-card';div.id='script-'+script.id;
-// Shot cards instead of table
-var shotHtml=(script.shots||[]).map(function(s){
-return '<div class="shot-card"><div class="shot-head"><span class="shot-badge">S'+s.shotNum+'</span><span style="font-size:12px;color:var(--muted)">'+s.duration+'s 路 '+escHtml(s.type)+'</span></div>'
-+'<div class="shot-info">'+escHtml(s.action)+'</div>'
-+'<div class="shot-meta">馃搷 '+escHtml(s.location)+' 路 馃挮 '+escHtml(s.mood)+'</div></div>'}).join('');
-// Acts
-var actsHtml='<div class="acts-grid">'
-+'<div class="act-block"><div class="act-title" style="color:var(--accent1)">绗竴骞?路 寤虹珛</div><div class="act-body">'+escHtml(script.act1||'')+'</div></div>'
-+'<div class="act-block"><div class="act-title" style="color:var(--accent2)">绗簩骞?路 鍙戝睍</div><div class="act-body">'+escHtml(script.act2||'')+'</div></div>'
-+'<div class="act-block"><div class="act-title" style="color:var(--accent3)">绗笁骞?路 楂樻疆</div><div class="act-body">'+escHtml(script.act3||'')+'</div></div>'
-+'</div>';
-div.innerHTML='<div class="sc-header" onclick="toggleScript(\''+script.id+'\')">'
-+'<span style="font-size:16px">馃幀</span><div><div class="sc-title">'+escHtml(script.title)+'</div>'
-+'<div style="font-size:12px;color:var(--muted)">'+escHtml(script.logline||'')+'</div></div>'
-+'<span class="sc-dur">'+script.duration+'s 路 '+(script.shots||[]).length+'闀?/span>'
-+'<span class="sc-toggle">鈻?/span></div>'
-+'<div class="sc-body">'
-+'<div style="font-size:12px;color:var(--muted);margin-bottom:8px">涓婚锛?span style="color:var(--text)">'+escHtml(script.theme||'')+'</span> 路 '+script.createdAt+'</div>'
-+actsHtml+shotHtml
-+'<div style="display:flex;gap:8px;margin-top:10px">'
-+'<button class="btn btn-orange btn-sm" onclick="selectScriptForPrompts(\''+script.id+'\')">馃殌 鐢熸垚鎻愮ず璇?/button>'
-+'<button class="btn btn-ghost btn-sm" onclick="deleteScript(\''+script.id+'\')">馃棏锔?鍒犻櫎</button>'
-+'</div></div>';
-list.appendChild(div)});
-updateCounts();updateScriptSelect()}
+var shotHtml=(script.shots||[]).map(function(s){return '<div class="shot-card"><div class="shot-head"><span class="shot-badge">S'+s.shotNum+'</span><span style="font-size:12px;color:var(--muted)">'+s.duration+'s · '+escHtml(s.type)+'</span></div><div class="shot-info">'+escHtml(s.action)+'</div><div class="shot-meta">📍 '+escHtml(s.location)+' · 💫 '+escHtml(s.mood)+'</div></div>'}).join('');
+var actsHtml='<div class="acts-grid"><div class="act-block"><div class="act-title" style="color:var(--accent1)">第一幕 · 建立</div><div class="act-body">'+escHtml(script.act1||'')+'</div></div><div class="act-block"><div class="act-title" style="color:var(--accent2)">第二幕 · 发展</div><div class="act-body">'+escHtml(script.act2||'')+'</div></div><div class="act-block"><div class="act-title" style="color:var(--accent3)">第三幕 · 高潮</div><div class="act-body">'+escHtml(script.act3||'')+'</div></div></div>';
+div.innerHTML='<div class="sc-header" onclick="toggleScript(\''+script.id+'\')"><span style="font-size:16px">🎬</span><div><div class="sc-title">'+escHtml(script.title)+'</div><div style="font-size:12px;color:var(--muted)">'+escHtml(script.logline||'')+'</div></div><span class="sc-dur">'+script.duration+'s · '+(script.shots||[]).length+'镜</span><span class="sc-toggle">▶</span></div><div class="sc-body"><div style="font-size:12px;color:var(--muted);margin-bottom:8px">主题：<span style="color:var(--text)">'+escHtml(script.theme||'')+'</span> · '+(script.createdAt||'')+'</div>'+actsHtml+shotHtml+'<div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-orange btn-sm" onclick="selectScriptForPrompts(\''+script.id+'\')">🚀 生成提示词</button><button class="btn btn-ghost btn-sm" onclick="deleteScript(\''+script.id+'\')">🗑️ 删除</button></div></div>';
+list.appendChild(div)});updateCounts();updateScriptSelect()}
 
-function toggleScript(id){var el=$('script-'+id);el.classList.toggle('expanded')}
+function toggleScript(id){$('script-'+id).classList.toggle('expanded')}
 function deleteScript(id){DB.scripts=DB.scripts.filter(function(s){return s.id!==id});DB.save();renderScripts()}
-function selectScriptForPrompts(id){$('select-script').value=id;switchTab('prompts');toast('宸查€夋嫨鍓ф湰锛岀偣鍑汇€岀敓鎴愭彁绀鸿瘝銆?,'info')}
-function updateScriptSelect(){var sel=$('select-script');var cur=sel.value;sel.innerHTML='<option value="">鈥?閫夋嫨鍒嗛暅鑴氭湰 鈥?/option>';
-DB.scripts.forEach(function(s){var opt=document.createElement('option');opt.value=s.id;opt.textContent=s.title+' ('+s.duration+'s 路 '+(s.shots||[]).length+'闀?';sel.appendChild(opt)});if(cur)sel.value=cur}
-function clearScripts(){if(!confirm('纭畾娓呯┖鎵€鏈夊墽鏈紵'))return;DB.scripts=[];DB.save();renderScripts()}
+function selectScriptForPrompts(id){$('select-script').value=id;switchTab('prompts');toast('已选择剧本，点击生成提示词','info')}
+function updateScriptSelect(){var sel=$('select-script');var cur=sel.value;sel.innerHTML='<option value="">— 选择分镜脚本 —</option>';DB.scripts.forEach(function(s){var opt=document.createElement('option');opt.value=s.id;opt.textContent=s.title+' ('+s.duration+'s · '+(s.shots||[]).length+'镜)';sel.appendChild(opt)});if(cur)sel.value=cur}
+function clearScripts(){if(!confirm('确定清空所有剧本？'))return;DB.scripts=[];DB.save();renderScripts()}
 
-// === PROMPTS GENERATION ===
+// === PROMPTS ===
 async function runPromptsGeneration(){
 var cfg=getCfg();var scriptId=$('select-script').value;
-if(!scriptId){toast('璇峰厛閫夋嫨涓€涓垎闀滆剼鏈?,'error');return}
+if(!scriptId){toast('请先选择一个分镜脚本','error');return}
 var script=DB.scripts.find(function(s){return s.id===scriptId});if(!script)return;
 var btn=$('btn-prompts');setBtnLoading(btn,true);setProgress('prompts-progress',10);
-var shotsDesc=(script.shots||[]).map(function(s){return '闀滃彿'+s.shotNum+'锛?+s.type+'锛?+s.duration+'s锛夛細鍦烘櫙='+s.location+'锛屽姩浣?'+s.action+'锛屾儏缁?'+s.mood+'锛屽娉?'+(s.visualNote||'')}).join('\n');
-var prompt='浣犳槸 Seedance 2.0 瑙嗛鐢熸垚涓撳锛屾搮闀挎挵鍐欑簿鍑嗙殑 AI 瑙嗛鎻愮ず璇嶃€俓n\n銆愬墽鏈俊鎭€慭n鏍囬锛?+script.title+'\n涓婚锛?+script.theme+'\n鏃堕暱锛?+script.duration+'绉抃n鐢婚潰姣斾緥锛?+cfg.ratio+'\n鐢婚锛?+cfg.visualStyle+'\n\n銆愬垎闀滃垪琛ㄣ€慭n'+shotsDesc+'\n\n璇蜂负姣忎釜鍒嗛暅鐢熸垚涓€鏉￠珮璐ㄩ噺鐨?Seedance 2.0 鑻辨枃鎻愮ず璇嶃€俓n\nSeedance 2.0 鎻愮ず璇嶈鑼冿細\n1. 浣跨敤鑻辨枃锛岀畝娲佺簿鍑哱n2. 缁撴瀯锛歔闀滃ご绫诲瀷] + [涓讳綋鎻忚堪] + [鍔ㄤ綔/鐘舵€乚 + [鍦烘櫙/鑳屾櫙] + [鍏夌嚎/鑹插僵] + [鎯呯华/姘涘洿] + [鐢婚]\n3. 闀滃ご绫诲瀷锛歝lose-up / medium shot / wide shot / aerial shot / tracking shot / dolly zoom\n4. 蹇呴』鍖呭惈鍔ㄦ€佹弿杩拌瘝锛堝锛歴low zoom in, panning left, handheld shake锛塡n5. 閬垮厤浣跨敤 NSFW 鍐呭\n6. 姣忔潯鎻愮ず璇?40-80 涓崟璇峔n\n涓ユ牸鎸変互涓?JSON 鏍煎紡杈撳嚭锛歕n[{"shotNum":1,"shotType":"闀滃ご绫诲瀷涓枃","duration":5,"prompt_en":"English prompt","prompt_zh":"涓枃缈昏瘧","cameraMove":"杩愰暅鏂瑰紡","mood":"鎯呯华鍏抽敭璇?}]\n\n鍙緭鍑?JSON 鏁扮粍銆?;
+var shotsDesc=(script.shots||[]).map(function(s){return '镜号'+s.shotNum+'（'+s.type+'，'+s.duration+'s）：场景='+s.location+'，动作='+s.action+'，情绪='+s.mood}).join('\n');
+var prompt='你是 Seedance 2.0 视频生成专家。\n\n【剧本信息】\n标题：'+script.title+'\n主题：'+script.theme+'\n时长：'+script.duration+'秒\n画面比例：'+cfg.ratio+'\n画风：'+cfg.visualStyle+'\n\n【分镜列表】\n'+shotsDesc+'\n\n请为每个分镜生成英文提示词（40-80词）。\n\nJSON 格式：\n[{"shotNum":1,"shotType":"镜头类型","duration":5,"prompt_en":"English prompt","prompt_zh":"中文翻译","cameraMove":"运镜","mood":"情绪"}]\n\n只输出 JSON 数组。';
 try{setProgress('prompts-progress',30);
 var raw=await callAI([{role:'user',content:prompt}]);setProgress('prompts-progress',80);
-var match=raw.match(/\[[\s\S]*\]/);if(!match){addLog('err','鎻愮ず璇嶏細杩斿洖鏍煎紡閿欒',raw.slice(0,1000));throw new Error('杩斿洖鏍煎紡閿欒')}
-var prompts;try{prompts=tryParseJSON(match[0])}catch(pe){addLog('err','鎻愮ず璇?JSON 瑙ｆ瀽澶辫触',pe.message);throw pe}
+var match=raw.match(/\[[\s\S]*\]/);if(!match){addLog('err','提示词：返回格式错误',raw.slice(0,1000));throw new Error('返回格式错误')}
+var prompts;try{prompts=tryParseJSON(match[0])}catch(pe){addLog('err','提示词 JSON 解析失败',pe.message);throw pe}
 var record={id:'prompts_'+Date.now(),scriptId:scriptId,scriptTitle:script.title,visualStyle:cfg.visualStyle,ratio:cfg.ratio,createdAt:new Date().toLocaleString(),shots:prompts};
 DB.prompts.push(record);DB.save();renderPrompts();setProgress('prompts-progress',100);
-addLog('ok','鎻愮ず璇嶅畬鎴愶細'+prompts.length+' 鏉?);toast('鉁?鐢熸垚浜?'+prompts.length+' 鏉℃彁绀鸿瘝锛?,'success');
-}catch(e){addLog('err','鎻愮ず璇嶇敓鎴愬け璐?,e.message);toast('鐢熸垚澶辫触锛?+e.message,'error');setProgress('prompts-progress',0)}
+addLog('ok','提示词完成：'+prompts.length+' 条');toast('✨ 生成了 '+prompts.length+' 条提示词！','success');
+}catch(e){addLog('err','提示词生成失败',e.message);toast('生成失败：'+e.message,'error');setProgress('prompts-progress',0)}
 finally{setBtnLoading(btn,false);setTimeout(function(){setProgress('prompts-progress',0)},1500)}}
 
 function renderPrompts(){
 var list=$('prompts-list');list.innerHTML='';
-if(DB.prompts.length===0){list.innerHTML='<div class="empty-state"><div class="es-icon">馃幀</div><p>浠庡墽鏈敓鎴愬垎闀滃悗锛岄€夋嫨鍒嗛暅鐢熸垚鎻愮ず璇?/p></div>';updateCounts();return}
+if(DB.prompts.length===0){list.innerHTML='<div class="empty-state"><div class="es-icon">🎬</div><p>从剧本生成分镜后，选择分镜生成提示词</p></div>';updateCounts();return}
 DB.prompts.forEach(function(record){
 var groupDiv=document.createElement('div');
-groupDiv.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)">'
-+'<span style="font-size:14px;font-weight:700">'+escHtml(record.scriptTitle)+'</span>'
-+'<span style="font-size:12px;color:var(--muted)">'+record.ratio+'</span>'
-+'<span style="font-size:12px;color:var(--muted);margin-left:auto">'+record.createdAt+'</span>'
-+'<button class="btn btn-danger btn-sm" onclick="deletePromptRecord(\''+record.id+'\')">馃棏锔?/button></div>';
+groupDiv.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)"><span style="font-size:14px;font-weight:700">'+escHtml(record.scriptTitle)+'</span><span style="font-size:12px;color:var(--muted)">'+record.ratio+'</span><span style="font-size:12px;color:var(--muted);margin-left:auto">'+(record.createdAt||'')+'</span><button class="btn btn-danger btn-sm" onclick="deletePromptRecord(\''+record.id+'\')">🗑️</button></div>';
 (record.shots||[]).forEach(function(shot){
 var div=document.createElement('div');div.className='prompt-card';
-div.innerHTML='<div class="pc-header"><span class="pc-shot">闀滃ご '+shot.shotNum+'</span>'
-+'<span class="pc-title">'+escHtml(shot.shotType)+' 路 '+shot.duration+'s</span>'
-+'<button class="btn btn-ghost btn-sm" onclick="copySinglePrompt(this)">馃搵</button></div>'
-+'<div class="pc-en">'+escHtml(shot.prompt_en)+'</div>'
-+'<div style="font-size:12px;color:var(--muted);line-height:1.5;margin-top:4px">'+escHtml(shot.prompt_zh)+'</div>'
-+'<div class="pc-meta"><span class="pc-tag">馃摲 '+escHtml(shot.cameraMove)+'</span><span class="pc-tag">馃挮 '+escHtml(shot.mood)+'</span></div>';
-div.dataset.prompt=shot.prompt_en;
-groupDiv.appendChild(div)});
+div.innerHTML='<div class="pc-header"><span class="pc-shot">镜头 '+shot.shotNum+'</span><span class="pc-title">'+escHtml(shot.shotType)+' · '+shot.duration+'s</span><button class="btn btn-ghost btn-sm" onclick="copySinglePrompt(this)">📋</button></div><div class="pc-en">'+escHtml(shot.prompt_en)+'</div><div style="font-size:12px;color:var(--muted);line-height:1.5;margin-top:4px">'+escHtml(shot.prompt_zh)+'</div><div class="pc-meta"><span class="pc-tag">📷 '+escHtml(shot.cameraMove)+'</span><span class="pc-tag">💫 '+escHtml(shot.mood)+'</span></div>';
+div.dataset.prompt=shot.prompt_en;groupDiv.appendChild(div)});
 list.appendChild(groupDiv)});updateCounts()}
 
-function copySinglePrompt(btn){var card=btn.closest('.prompt-card');var t=card.dataset.prompt;navigator.clipboard.writeText(t).then(function(){btn.textContent='鉁?;setTimeout(function(){btn.textContent='馃搵'},1500)})}
+function copySinglePrompt(btn){var card=btn.closest('.prompt-card');navigator.clipboard.writeText(card.dataset.prompt).then(function(){btn.textContent='✅';setTimeout(function(){btn.textContent='📋'},1500)})}
 function deletePromptRecord(id){DB.prompts=DB.prompts.filter(function(p){return p.id!==id});DB.save();renderPrompts()}
-function copyAllPrompts(){var all=DB.prompts.flatMap(function(r){return(r.shots||[]).map(function(s){return '// Shot '+s.shotNum+': '+s.shotType+'\n'+s.prompt_en})});if(!all.length){toast('杩樻病鏈夋彁绀鸿瘝','error');return}navigator.clipboard.writeText(all.join('\n\n')).then(function(){toast('鉁?宸插鍒?'+all.length+' 鏉℃彁绀鸿瘝','success')})}
-function clearPrompts(){if(!confirm('纭畾娓呯┖鎵€鏈夋彁绀鸿瘝锛?))return;DB.prompts=[];DB.save();renderPrompts()}
-
+function copyAllPrompts(){var all=[];DB.prompts.forEach(function(r){(r.shots||[]).forEach(function(s){all.push('// Shot '+s.shotNum+': '+s.shotType+'\n'+s.prompt_en)})});if(!all.length){toast('还没有提示词','error');return}navigator.clipboard.writeText(all.join('\n\n')).then(function(){toast('✅ 已复制 '+all.length+' 条提示词','success')})}
+function clearPrompts(){if(!confirm('确定清空所有提示词？'))return;DB.prompts=[];DB.save();renderPrompts()}
 
 // === PRESET ===
 function exportPreset(){
@@ -713,79 +589,46 @@ video:{durationMin:$('cfg-duration-min').value,durationMax:$('cfg-duration-max')
 var blob=new Blob([JSON.stringify(preset,null,2)],{type:'application/json'});
 var a=document.createElement('a');a.href=URL.createObjectURL(blob);
 var safeName=presetName?presetName.replace(/[\\/:*?"<>|]/g,'_'):new Date().toISOString().slice(0,10);
-a.download='preset_'+safeName+'.json';a.click();toast('棰勮閰嶇疆宸插鍑?,'success')}
+a.download='preset_'+safeName+'.json';a.click();toast('预设配置已导出','success')}
 
 function importPreset(){$('preset-file').click()}
 function handlePresetImport(e){
 var file=e.target.files[0];if(!file)return;
 var reader=new FileReader();reader.onload=function(ev){
 try{var preset=JSON.parse(ev.target.result);
-if(preset._type!=='story-workflow-preset'){toast('鏂囦欢鏍煎紡涓嶆纭?,'error');return}
+if(preset._type!=='story-workflow-preset'){toast('文件格式不正确','error');return}
 if(preset.name)$('cfg-preset-name').value=preset.name;
-if(preset.config){
-if(preset.config.baseUrl)$('cfg-base-url').value=preset.config.baseUrl;
-if(preset.config.apiKey)$('cfg-api-key').value=preset.config.apiKey;
-if(preset.config.model){$('cfg-model').value=preset.config.model;$('custom-model-group').style.display=preset.config.model==='custom'?'flex':'none'}
-if(preset.config.modelCustom)$('cfg-model-custom').value=preset.config.modelCustom}
-if(preset.brainstorm){
-if(preset.brainstorm.batch)$('cfg-batch').value=preset.brainstorm.batch;
-if(preset.brainstorm.background!==undefined)$('cfg-background').value=preset.brainstorm.background;
-if(preset.brainstorm.reference!==undefined)$('cfg-reference').value=preset.brainstorm.reference}
-if(preset.video){
-if(preset.video.durationMin)$('cfg-duration-min').value=preset.video.durationMin;
-if(preset.video.durationMax)$('cfg-duration-max').value=preset.video.durationMax;
-if(preset.video.shotDur)$('cfg-shot-dur').value=preset.video.shotDur;
-if(preset.video.ratio)$('cfg-ratio').value=preset.video.ratio;
-if(preset.video.visualStyle!==undefined)$('cfg-visual-style').value=preset.video.visualStyle}
-toast('棰勮閰嶇疆瀵煎叆鎴愬姛锛?,'success')}catch(err){toast('鏂囦欢瑙ｆ瀽澶辫触锛?+err.message,'error')}};
+if(preset.config){if(preset.config.baseUrl)$('cfg-base-url').value=preset.config.baseUrl;if(preset.config.apiKey)$('cfg-api-key').value=preset.config.apiKey;if(preset.config.model){$('cfg-model').value=preset.config.model;$('custom-model-group').style.display=preset.config.model==='custom'?'flex':'none'}if(preset.config.modelCustom)$('cfg-model-custom').value=preset.config.modelCustom}
+if(preset.brainstorm){if(preset.brainstorm.batch)$('cfg-batch').value=preset.brainstorm.batch;if(preset.brainstorm.background!==undefined)$('cfg-background').value=preset.brainstorm.background;if(preset.brainstorm.reference!==undefined)$('cfg-reference').value=preset.brainstorm.reference}
+if(preset.video){if(preset.video.durationMin)$('cfg-duration-min').value=preset.video.durationMin;if(preset.video.durationMax)$('cfg-duration-max').value=preset.video.durationMax;if(preset.video.shotDur)$('cfg-shot-dur').value=preset.video.shotDur;if(preset.video.ratio)$('cfg-ratio').value=preset.video.ratio;if(preset.video.visualStyle!==undefined)$('cfg-visual-style').value=preset.video.visualStyle}
+toast('预设配置导入成功！','success')}catch(err){toast('文件解析失败：'+err.message,'error')}};
 reader.readAsText(file);e.target.value=''}
 
 function exportApprovedStories(){
 var approved=DB.ideas.filter(function(i){return i.status==='approved'});
-if(approved.length===0){toast('娌℃湁宸叉壒鍑嗙殑鍒涙剰','error');return}
-var data=JSON.stringify({exportTime:new Date().toLocaleString(),count:approved.length,stories:approved},null,2);
-var blob=new Blob([data],{type:'application/json'});var a=document.createElement('a');
-a.href=URL.createObjectURL(blob);a.download='approved-stories_'+new Date().toISOString().slice(0,10)+'.json';a.click();
-toast('宸插鍑?'+approved.length+' 涓噰绾虫晠浜嬶紒','success')}
+if(approved.length===0){toast('没有已批准的创意','error');return}
+var blob=new Blob([JSON.stringify({exportTime:new Date().toLocaleString(),count:approved.length,stories:approved},null,2)],{type:'application/json'});
+var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='approved-stories_'+new Date().toISOString().slice(0,10)+'.json';a.click();
+toast('已导出 '+approved.length+' 个采纳故事！','success')}
 
-// === COUNTS & PROGRESS DOTS ===
+// === COUNTS ===
 function updateCounts(){
-var total=DB.ideas.length;
-var approved=DB.ideas.filter(function(i){return i.status==='approved'}).length;
-var scriptCount=DB.scripts.length;
-var shotCount=DB.scripts.reduce(function(a,s){return a+(s.shots||[]).length},0);
+var total=DB.ideas.length;var approved=DB.ideas.filter(function(i){return i.status==='approved'}).length;
+var scriptCount=DB.scripts.length;var shotCount=DB.scripts.reduce(function(a,s){return a+(s.shots||[]).length},0);
 var promptCount=DB.prompts.reduce(function(a,p){return a+(p.shots||[]).length},0);
 $('badge-ideas').textContent=total;$('badge-scripts').textContent=scriptCount;$('badge-prompts').textContent=promptCount;
-// Progress dots
 var dots=[total>0,approved>0,scriptCount>0,shotCount>0,promptCount>0];
-for(var i=0;i<5;i++){var d=$('pd'+(i+1));d.className='pdot'+(dots[i]?' done':'')}
-var label='';
-if(promptCount>0)label=promptCount+' 鎻愮ず璇?;
-else if(shotCount>0)label=shotCount+' 鍒嗛暅';
-else if(scriptCount>0)label=scriptCount+' 鍓ф湰';
-else if(approved>0)label=approved+' 宸叉壒鍑?;
-else if(total>0)label=total+' 鍒涙剰';
-else label='0 鍒涙剰';
+for(var i=0;i<5;i++){$('pd'+(i+1)).className='pdot'+(dots[i]?' done':'')}
+var label=promptCount>0?promptCount+' 提示词':shotCount>0?shotCount+' 分镜':scriptCount>0?scriptCount+' 剧本':approved>0?approved+' 已批准':total>0?total+' 创意':'0 创意';
 $('pd-label').textContent=label}
 
 // === INIT ===
 document.addEventListener('DOMContentLoaded',function(){
 DB.load();renderIdeas();renderScripts();renderPrompts();updateCounts();
-// Load saved config
 var savedCfg=localStorage.getItem('workflow_config');
-if(savedCfg){try{var cfg=JSON.parse(savedCfg);
-if(cfg.baseUrl)$('cfg-base-url').value=cfg.baseUrl;
-if(cfg.apiKey)$('cfg-api-key').value=cfg.apiKey;
-if(cfg.model)$('cfg-model').value=cfg.model}catch(e){}}
-// Auto-save config
-['cfg-base-url','cfg-api-key','cfg-model'].forEach(function(id){
-$(id).addEventListener('change',function(){
-localStorage.setItem('workflow_config',JSON.stringify({baseUrl:$('cfg-base-url').value,apiKey:$('cfg-api-key').value,model:$('cfg-model').value}))})});
-// Load preference
+if(savedCfg){try{var cfg=JSON.parse(savedCfg);if(cfg.baseUrl)$('cfg-base-url').value=cfg.baseUrl;if(cfg.apiKey)$('cfg-api-key').value=cfg.apiKey;if(cfg.model)$('cfg-model').value=cfg.model}catch(e){}}
+['cfg-base-url','cfg-api-key','cfg-model'].forEach(function(id){$(id).addEventListener('change',function(){localStorage.setItem('workflow_config',JSON.stringify({baseUrl:$('cfg-base-url').value,apiKey:$('cfg-api-key').value,model:$('cfg-model').value}))})});
 if(loadPreferenceFromStorage()){displayPreference(currentPreference)}});
-
 </script>
 </body>
 </html>
-
-
