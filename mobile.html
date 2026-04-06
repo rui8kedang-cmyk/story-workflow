@@ -246,9 +246,9 @@ border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
 <h3>💾 预设管理</h3>
 <div class="form-group"><label>预设文件名</label>
 <input type="text" id="cfg-preset-name" placeholder="如：艾迪星、土松嘟嘟"/></div>
-<button class="btn btn-ghost btn-block" onclick="exportPreset()">💾 导出预设配置</button>
-<button class="btn btn-ghost btn-block" style="margin-top:8px" onclick="importPreset()">📂 导入预设配置</button>
-<input type="file" id="preset-file" accept=".json" style="display:none" onchange="handlePresetImport(event)"/>
+<button class="btn btn-ghost btn-block" onclick="showPresetPicker()">📂 选择预设配置</button>
+<div id="preset-picker" style="display:none;margin-top:8px"></div>
+<button class="btn btn-ghost btn-block" style="margin-top:8px" onclick="exportPreset()">💾 导出预设配置</button>
 <div class="divider"></div>
 <button class="btn btn-ghost btn-block" onclick="exportApprovedStories()">📥 导出已采纳故事</button>
 </div>
@@ -280,9 +280,9 @@ border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
 <div id="preference-empty" style="color:var(--muted);font-size:12px">
 <p style="margin-bottom:8px">未加载偏好文件。</p>
 <div style="display:flex;gap:8px">
-<button class="btn btn-ghost btn-sm" onclick="document.getElementById('skill-file-input').click()">📤 上传 Skill</button>
-<input type="file" id="skill-file-input" accept=".json" style="display:none" onchange="loadSkillFile(event)">
+<button class="btn btn-ghost btn-sm" onclick="showSkillPicker()">📂 选择 Skill</button>
 <button class="btn btn-ghost btn-sm" onclick="clearPreference()">🗑️ 清除</button>
+<div id="skill-picker" style="display:none;margin-top:8px"></div>
 </div></div></div>
 </div>
 
@@ -629,6 +629,52 @@ var savedCfg=localStorage.getItem('workflow_config');
 if(savedCfg){try{var cfg=JSON.parse(savedCfg);if(cfg.baseUrl)$('cfg-base-url').value=cfg.baseUrl;if(cfg.apiKey)$('cfg-api-key').value=cfg.apiKey;if(cfg.model)$('cfg-model').value=cfg.model}catch(e){}}
 ['cfg-base-url','cfg-api-key','cfg-model'].forEach(function(id){$(id).addEventListener('change',function(){localStorage.setItem('workflow_config',JSON.stringify({baseUrl:$('cfg-base-url').value,apiKey:$('cfg-api-key').value,model:$('cfg-model').value}))})});
 if(loadPreferenceFromStorage()){displayPreference(currentPreference)}});
+
+// === REMOTE LOADING ===
+var MANIFEST_URL='https://story-workflow.pages.dev/manifest.json';
+var BASE_URL='https://story-workflow.pages.dev/';
+
+async function loadManifest(){
+try{var res=await fetch(MANIFEST_URL);if(!res.ok)throw new Error('HTTP '+res.status);return await res.json()}
+catch(e){toast('加载清单失败: '+e.message,'error');return null}}
+
+async function showPresetPicker(){
+var picker=$('preset-picker');if(picker.style.display!=='none'){picker.style.display='none';return}
+picker.innerHTML='<div style="text-align:center;padding:8px"><span class="spinner"></span> 加载中...</div>';
+picker.style.display='block';
+var manifest=await loadManifest();if(!manifest){picker.innerHTML='<div style="color:var(--red);font-size:12px">加载失败</div>';return}
+if(!manifest.presets||manifest.presets.length===0){picker.innerHTML='<div style="color:var(--muted);font-size:12px">暂无预设</div>';return}
+picker.innerHTML=manifest.presets.map(function(p){return '<button class="btn btn-ghost btn-sm" style="width:100%;margin-bottom:6px" onclick="loadRemotePreset(\''+p.file+'\')"><span>📄</span> '+escHtml(p.name)+'<br><span style="font-size:11px;color:var(--muted)">'+escHtml(p.description||'')+'</span></button>'}).join('')}
+
+async function loadRemotePreset(file){
+try{toast('加载预设...','info');
+var res=await fetch(BASE_URL+file);if(!res.ok)throw new Error('HTTP '+res.status);
+var preset=await res.json();
+if(preset._type!=='story-workflow-preset'){toast('文件格式不正确','error');return}
+if(preset.name)$('cfg-preset-name').value=preset.name;
+if(preset.config){if(preset.config.baseUrl)$('cfg-base-url').value=preset.config.baseUrl;if(preset.config.apiKey)$('cfg-api-key').value=preset.config.apiKey;if(preset.config.model){$('cfg-model').value=preset.config.model;$('custom-model-group').style.display=preset.config.model==='custom'?'flex':'none'}if(preset.config.modelCustom)$('cfg-model-custom').value=preset.config.modelCustom}
+if(preset.brainstorm){if(preset.brainstorm.batch)$('cfg-batch').value=preset.brainstorm.batch;if(preset.brainstorm.background!==undefined)$('cfg-background').value=preset.brainstorm.background;if(preset.brainstorm.reference!==undefined)$('cfg-reference').value=preset.brainstorm.reference}
+if(preset.video){if(preset.video.durationMin)$('cfg-duration-min').value=preset.video.durationMin;if(preset.video.durationMax)$('cfg-duration-max').value=preset.video.durationMax;if(preset.video.shotDur)$('cfg-shot-dur').value=preset.video.shotDur;if(preset.video.ratio)$('cfg-ratio').value=preset.video.ratio;if(preset.video.visualStyle!==undefined)$('cfg-visual-style').value=preset.video.visualStyle}
+$('preset-picker').style.display='none';
+toast('✅ 预设「'+preset.name+'」已加载','success')}
+catch(e){toast('加载失败: '+e.message,'error')}}
+
+async function showSkillPicker(){
+var picker=$('skill-picker');if(picker.style.display!=='none'){picker.style.display='none';return}
+picker.innerHTML='<div style="text-align:center;padding:8px"><span class="spinner"></span></div>';
+picker.style.display='block';
+var manifest=await loadManifest();if(!manifest){picker.innerHTML='<div style="color:var(--red);font-size:12px">加载失败</div>';return}
+if(!manifest.skills||manifest.skills.length===0){picker.innerHTML='<div style="color:var(--muted);font-size:12px">暂无 Skill</div>';return}
+picker.innerHTML=manifest.skills.map(function(s){return '<button class="btn btn-ghost btn-sm" style="width:100%;margin-bottom:6px" onclick="loadRemoteSkill(\''+s.file+'\')"><span>📊</span> '+escHtml(s.name)+'<br><span style="font-size:11px;color:var(--muted)">'+escHtml(s.description||'')+'</span></button>'}).join('')}
+
+async function loadRemoteSkill(file){
+try{toast('加载 Skill...','info');
+var res=await fetch(BASE_URL+file);if(!res.ok)throw new Error('HTTP '+res.status);
+var data=await res.json();
+if(data.preference||data.report){currentPreference=data;localStorage.setItem('preference_skill',JSON.stringify(data));displayPreference(data);$('skill-picker').style.display='none';toast('✅ 偏好「'+data.name+'」已加载','success')}
+else{toast('文件格式不正确','error')}}
+catch(e){toast('加载失败: '+e.message,'error')}}
+
 </script>
 </body>
 </html>
