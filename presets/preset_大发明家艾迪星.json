@@ -5,8 +5,8 @@
   "exportTime": "2026/4/5 21:18:13",
   "config": {
     "baseUrl": "https://api.deepseek.com",
-    "apiKey": "",
-    "model": "deepseek-chat",
+    "apiKey": "sk-464b3066bbc34005876e1b4716eb398f",
+    "model": "deepseek-reasoner",
     "modelCustom": ""
   },
   "brainstorm": {
