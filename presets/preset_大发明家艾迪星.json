@@ -2,12 +2,12 @@
   "_type": "story-workflow-preset",
   "_version": 1,
   "name": "大发明家艾迪星",
-  "exportTime": "2026/4/5 21:18:13",
+  "exportTime": "2026/4/6 15:31:23",
   "config": {
     "baseUrl": "https://api.deepseek.com",
     "apiKey": "sk-464b3066bbc34005876e1b4716eb398f",
-    "model": "deepseek-reasoner",
-    "modelCustom": ""
+    "model": "custom",
+    "modelCustom": "deepseek-reasoner"
   },
   "brainstorm": {
     "batch": "10",
