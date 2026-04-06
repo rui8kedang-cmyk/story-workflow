@@ -1,0 +1,24 @@
+{
+  "_type": "story-workflow-preset",
+  "_version": 1,
+  "name": "大发明家艾迪星",
+  "exportTime": "2026/4/5 21:18:13",
+  "config": {
+    "baseUrl": "https://api.deepseek.com",
+    "apiKey": "",
+    "model": "deepseek-chat",
+    "modelCustom": ""
+  },
+  "brainstorm": {
+    "batch": "10",
+    "background": "主角是一个叫艾迪的小男孩，小学生，他是一个发明家，特点是，聪明，有些邋遢，鬼点子多，容易弄巧成拙。他总是会想办法用他的各种发明解决日常生活与上学遇到的难题，有的时候能够巧妙解决，但大多时候回闹出笑话。艾迪与爷爷一起生活，他的爷爷是一位大发明家，艾迪制作发明的零件都是从爷爷的垃圾中找到的。",
+    "reference": "迪士尼、皮克斯的3D动画"
+  },
+  "video": {
+    "durationMin": "60",
+    "durationMax": "120",
+    "shotDur": "15",
+    "ratio": "9:16",
+    "visualStyle": "迪士尼、皮克斯的3D动画风格"
+  }
+}

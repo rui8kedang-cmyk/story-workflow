@@ -1,0 +1,41 @@
+{
+  "name": "用户故事偏好",
+  "description": "基于用户历史数据的故事创作偏好",
+  "version": "1.0",
+  "createdAt": "2026-04-06T07:14:55.601Z",
+  "preference": {
+    "themes": {
+      "preferred": [
+        "科技发明幽默",
+        "日常生活趣事"
+      ],
+      "avoided": [
+        "悲剧结局",
+        "恐怖元素"
+      ]
+    },
+    "style": {
+      "visual": "生动夸张的卡通画风",
+      "narrative": "幽默与反转",
+      "structure": "难题-发明-实施-反转结局的结构"
+    },
+    "elements": [
+      "自制发明",
+      "传感器技术",
+      "喜剧性误判"
+    ],
+    "coreConcepts": [
+      "科技与日常的幽默碰撞",
+      "解决问题却制造新问题"
+    ],
+    "targetAudience": "儿童及青少年",
+    "suggestions": "建议继续发展'艾迪的发明'系列，探索更多日常场景（如学校、家庭）中的幽默科技故事，可增加角色互动或扩展发明类型。"
+  },
+  "metadata": {
+    "analyzedAt": "2026/4/5 21:20:22",
+    "sourceCount": {
+      "manual": 2,
+      "modify": 0
+    }
+  }
+}

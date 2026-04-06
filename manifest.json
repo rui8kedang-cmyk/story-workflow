@@ -1,0 +1,16 @@
+{
+  "presets": [
+    {
+      "name": "大发明家艾迪星",
+      "file": "presets/preset_大发明家艾迪星.json",
+      "description": "艾迪·星系列 - DeepSeek + 迪士尼3D风格"
+    }
+  ],
+  "skills": [
+    {
+      "name": "大发明家艾迪星",
+      "file": "skills/preference-skill-大发明家艾迪星.json",
+      "description": "科技发明幽默 · 卡通画风 · 反转结局"
+    }
+  ]
+}
