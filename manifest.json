@@ -11,6 +11,11 @@
       "name": "大发明家艾迪星",
       "file": "skills/preference-skill-大发明家艾迪星.json",
       "description": "科技发明幽默 · 卡通画风 · 反转结局"
+    },
+    {
+      "name": "Dreamina Seedance 2.0",
+      "file": "skills/dreamina-integration.json",
+      "description": "即梦 AI 视频生成 · Seedance 2.0 全能参考 · 多模态输入"
     }
   ]
 }
